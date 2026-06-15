@@ -2431,7 +2431,7 @@ const API = {
   // AUTH
   async login(userId, password) {
     const { data, error } = await _sb.auth.signInWithPassword({
-      email: userId.toLowerCase()+'@ccfa.local', password
+      email: userId.toLowerCase()+'@ccfa.co.id', password
     });
     if (error) return { success:false, message:'ID atau Password salah' };
     const { data:prof } = await _sb.from('profiles').select('*').eq('id',data.user.id).single();
