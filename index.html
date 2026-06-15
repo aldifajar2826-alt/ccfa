@@ -5,8 +5,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script>
     /* ★ GANTI dua nilai berikut dengan milik project Supabase kamu ★ */
-    window.__SB_URL  = 'https://uwlychyfkzrkwxrezaad.supabase.co/rest/v1/';
-    window.__SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3bHljaHlma3pya3d4cmV6YWFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTk0NjMsImV4cCI6MjA5NzA3NTQ2M30.0dwQpKZ5m1XBjp3TV2lNPXzet32g7aYvG7gj3B8O0Eg';
+    window.__SB_URL  = 'https://YOUR_PROJECT_REF.supabase.co';
+    window.__SB_ANON = 'YOUR_ANON_KEY';
   </script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Issue Report CC-FA</title>
@@ -2430,9 +2430,12 @@ const API = {
 
   // AUTH
   async login(userId, password) {
-    const { data, error } = await _sb.auth.signInWithPassword({
-      email: userId.toLowerCase()+'@ccfa.co.id', password
-    });
+    // Terima format: 'Admin' → 'admin@ccfa.co.id'
+    // atau email lengkap: 'admin@ccfa.co.id' → pakai langsung
+    const DOMAIN = '@ccfa.co.id';
+    const raw = userId.trim();
+    const email = raw.includes('@') ? raw.toLowerCase() : raw.toLowerCase() + DOMAIN;
+    const { data, error } = await _sb.auth.signInWithPassword({ email, password });
     if (error) return { success:false, message:'ID atau Password salah' };
     const { data:prof } = await _sb.from('profiles').select('*').eq('id',data.user.id).single();
     return { success:true,
