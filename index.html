@@ -2,12 +2,6 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
-  <script>
-    /* ★ GANTI dua nilai berikut dengan milik project Supabase kamu ★ */
-    window.__SB_URL  = 'https://uwlychyfkzrkwxrezaad.supabase.co';
-    window.__SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3bHljaHlma3pya3d4cmV6YWFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTk0NjMsImV4cCI6MjA5NzA3NTQ2M30.0dwQpKZ5m1XBjp3TV2lNPXzet32g7aYvG7gj3B8O0Eg';
-  </script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Issue Report CC-FA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -935,6 +929,35 @@ html { -webkit-text-size-adjust: 100%; }
 * { -webkit-tap-highlight-color: rgba(37,99,235,.1); }
 
 
+
+/* ── KPI PAGE ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;margin-top:16px;}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.kpi-card-head{padding:16px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.kpi-card-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.kpi-card-title{font-size:13px;font-weight:700;color:var(--text);}
+.kpi-card-formula{font-size:11px;color:var(--text2);margin-top:2px;font-style:italic;}
+.kpi-card-body{padding:18px 20px;}
+.kpi-input-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px;}
+.kpi-input-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:120px;}
+.kpi-input-group label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;}
+.kpi-input-group input,.kpi-input-group select{height:38px;border:1px solid var(--border);border-radius:9px;padding:0 11px;font-size:13px;color:var(--text);background:var(--bg);font-family:inherit;outline:none;transition:border .15s;}
+.kpi-input-group input:focus{border-color:#3b82f6;}
+.kpi-result{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px;}
+.kpi-result-label{font-size:12px;color:var(--text2);}
+.kpi-result-value{font-size:28px;font-weight:700;font-family:monospace;}
+.kpi-result-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
+.kpi-badge-good{background:rgba(16,185,129,.15);color:#10b981;}
+.kpi-badge-warn{background:rgba(245,158,11,.15);color:#f59e0b;}
+.kpi-badge-bad{background:rgba(239,68,68,.15);color:#ef4444;}
+.kpi-history{margin-top:16px;}
+.kpi-history-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
+.kpi-history-table{width:100%;border-collapse:collapse;font-size:12px;}
+.kpi-history-table th{background:var(--bg);padding:6px 10px;text-align:left;color:var(--text2);font-weight:600;border-bottom:1px solid var(--border);}
+.kpi-history-table td{padding:6px 10px;border-bottom:1px solid var(--border);color:var(--text);}
+.kpi-history-table tr:last-child td{border-bottom:none;}
+.kpi-sub-label{font-size:11px;color:var(--text2);margin:10px 0 6px;font-weight:600;}
+.kpi-sub-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
 </style>
 </head>
 <body>
@@ -1039,6 +1062,12 @@ html { -webkit-text-size-adjust: 100%; }
         </button>
       </div>
     </div>
+
+    <p class="sidebar-section-label">KPI</p>
+    <button class="sidebar-item" id="sbar-kpi" onclick="sidebarNav('kpi')">
+      <i class="ti ti-chart-bar"></i>
+      <span class="item-label">KPI</span>
+    </button>
 
     <p class="sidebar-section-label">Lainnya</p>
     <button class="sidebar-item" id="sbar-recycle-bin" onclick="sidebarNav('recycle-bin')">
@@ -2386,365 +2415,6 @@ html { -webkit-text-size-adjust: 100%; }
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-
-// ══════════════════════════════════════════════════════════════
-// SUPABASE BRIDGE — menggantikan google.script.run
-// ══════════════════════════════════════════════════════════════
-const _sb = window.supabase.createClient(window.__SB_URL, window.__SB_ANON);
-
-// ── Helpers ────────────────────────────────────────────────────
-function _fmtDate(s) {
-  if (!s) return '';
-  const d = new Date(s);
-  if (isNaN(d)) return '';
-  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
-}
-function _toISO(s) {
-  if (!s || s instanceof Date) return s ? s.toISOString().split('T')[0] : null;
-  const p = s.includes('/') ? s.split('/') : null;
-  if (p && p.length===3) return `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
-  return s.split('T')[0];
-}
-function _parseDate(s) {
-  if (!s) return new Date();
-  if (s instanceof Date) return s;
-  const p = s.split('/');
-  return p.length===3 ? new Date(`${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`) : new Date(s);
-}
-function _countWD(start, end, hols={}) {
-  let n=0; const c=new Date(start); c.setHours(0,0,0,0); const e=new Date(end); e.setHours(23,59,59,0);
-  while(c<=e){const dw=c.getDay(); if(dw>0&&dw<6){const k=c.toISOString().split('T')[0]; if(!hols[k])n++;} c.setDate(c.getDate()+1);}
-  return n;
-}
-function _genCaseNo(area, date, existing=[]) {
-  const R=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
-  const m=date.getMonth()+1, yr=String(date.getFullYear()).slice(-2);
-  const rom=R[m-1], pfx=area==='Tecno'?'Tecno':'DKE';
-  const re=new RegExp(`/SO-${pfx}/${rom}/${yr}$`);
-  const seq=(existing||[]).filter(c=>c&&re.test(c)).length+1;
-  return `${String(seq).padStart(3,'0')}/SO-${pfx}/${rom}/${yr}`;
-}
-
-// ── API object ──────────────────────────────────────────────────
-const API = {
-
-  // AUTH
-  async login(userId, password) {
-    // Terima format: 'Admin' → 'admin@ccfa.co.id'
-    // atau email lengkap: 'admin@ccfa.co.id' → pakai langsung
-    const DOMAIN = '@ccfa.co.id';
-    const raw = userId.trim();
-    const email = raw.includes('@') ? raw.toLowerCase() : raw.toLowerCase() + DOMAIN;
-    const { data, error } = await _sb.auth.signInWithPassword({ email, password });
-    if (error) return { success:false, message:'ID atau Password salah' };
-    const { data:prof } = await _sb.from('profiles').select('*').eq('id',data.user.id).single();
-    return { success:true,
-      token: data.session.access_token,
-      user: { id:prof.user_id, displayName:prof.display_name, role:prof.role, avatar:prof.avatar_base64||'' }
-    };
-  },
-  async logout(token) { await _sb.auth.signOut(); return {success:true}; },
-  async saveAvatar(token, b64) {
-    const { data:{user} } = await _sb.auth.getUser();
-    if (!user) return {success:false};
-    await _sb.from('profiles').update({avatar_base64:b64}).eq('id',user.id);
-    return {success:true};
-  },
-
-  // ISSUES
-  async getAllIssues() {
-    const {data,error} = await _sb.from('issues').select('*').order('input_date',{ascending:false});
-    if(error) throw error;
-    return data.map((r,i)=>({
-      rowIndex:i+2, id:r.id, caseNo:r.case_no,
-      inputDate:_fmtDate(r.input_date), area:r.area,
-      description:r.description, status:r.status,
-      resolution:r.resolution||'', doneDate:_fmtDate(r.done_date),
-      workDays:r.work_days||'', attachments:r.attachments||[],
-      inputMonth:r.input_month, inputYear:r.input_year,
-    }));
-  },
-  async addIssue(payload) {
-    const inputDate = _parseDate(payload.inputDate);
-    const {data:ex} = await _sb.from('issues').select('case_no');
-    const caseNo = _genCaseNo(payload.area, inputDate, (ex||[]).map(r=>r.case_no));
-    let doneDate=null, workDays=null;
-    if (payload.status==='Done'&&payload.doneDate) {
-      doneDate=_toISO(_parseDate(payload.doneDate));
-      const hols=await API.getHolidays();
-      workDays=_countWD(inputDate,_parseDate(payload.doneDate),hols);
-    }
-    const {data,error} = await _sb.from('issues').insert({
-      case_no:caseNo, input_date:_toISO(inputDate), area:payload.area,
-      description:payload.description, status:payload.status||'Open',
-      resolution:payload.resolution||'', done_date:doneDate, work_days:workDays,
-      attachments:payload.attachments||[], input_month:inputDate.getMonth()+1,
-      input_year:inputDate.getFullYear(),
-    }).select().single();
-    if(error) throw error;
-    return {success:true, caseNo, data};
-  },
-  async updateIssue(id, payload) {
-    const upd={};
-    if(payload.area)                    upd.area=payload.area;
-    if(payload.description)             upd.description=payload.description;
-    if(payload.status)                  upd.status=payload.status;
-    if(payload.resolution!==undefined)  upd.resolution=payload.resolution;
-    if(payload.attachments)             upd.attachments=payload.attachments;
-    if(payload.inputDate) {
-      const d=_parseDate(payload.inputDate);
-      upd.input_date=_toISO(d); upd.input_month=d.getMonth()+1; upd.input_year=d.getFullYear();
-    }
-    // Done date & work days
-    let dDate = payload.doneDate ? _parseDate(payload.doneDate) : null;
-    if(payload.status==='Done' && !dDate) dDate=new Date();
-    if(dDate) {
-      upd.done_date=_toISO(dDate);
-      const hols=await API.getHolidays();
-      const startD = payload.inputDate ? _parseDate(payload.inputDate) : new Date(upd.input_date||Date.now());
-      upd.work_days=_countWD(startD, dDate, hols);
-    }
-    if(payload.status && payload.status!=='Done') { upd.done_date=null; upd.work_days=null; }
-    const {error}=await _sb.from('issues').update(upd).eq('id',id);
-    if(error) throw error;
-    return {success:true};
-  },
-  async deleteIssue(id) {
-    const {data:iss}=await _sb.from('issues').select('*').eq('id',id).single();
-    if(iss) await _sb.from('issues_bin').insert({...iss, original_id:iss.id, id:undefined, deleted_at:new Date().toISOString()});
-    await _sb.from('issues').delete().eq('id',id);
-    return {success:true};
-  },
-
-  // BIN
-  async getAllBinIssues() {
-    const {data,error}=await _sb.from('issues_bin').select('*').order('deleted_at',{ascending:false});
-    if(error) throw error;
-    return data.map((r,i)=>({
-      binRowIndex:i, id:r.id, caseNo:r.case_no,
-      inputDate:_fmtDate(r.input_date), area:r.area,
-      description:r.description, status:r.status,
-      resolution:r.resolution||'', attachments:r.attachments||[],
-      deletedAt:_fmtDate(r.deleted_at),
-    }));
-  },
-  async restoreFromBin(id) {
-    const {data:item}=await _sb.from('issues_bin').select('*').eq('id',id).single();
-    if(!item) return {success:false};
-    const {original_id,deleted_at,id:_,... rest}=item;
-    await _sb.from('issues').upsert({...rest, id:original_id||undefined});
-    await _sb.from('issues_bin').delete().eq('id',id);
-    return {success:true};
-  },
-  async permanentDeleteFromBin(id) {
-    await _sb.from('issues_bin').delete().eq('id',id);
-    return {success:true};
-  },
-  async emptyRecycleBin() {
-    await _sb.from('issues_bin').delete().neq('id','00000000-0000-0000-0000-000000000000');
-    return {success:true};
-  },
-
-  // ADJUSTMENTS
-  async getAllAdjust() {
-    const {data,error}=await _sb.from('adjustments').select('*').order('input_date',{ascending:false});
-    if(error) throw error;
-    return data.map((r,i)=>({
-      rowIndex:i+2, id:r.id, adjId:r.adj_id, bulan:r.bulan, tahun:r.tahun,
-      noSistem:r.no_sistem, keterangan:r.keterangan, jenis:r.jenis,
-      area:r.area, lampiran:r.lampiran||[], inputDate:_fmtDate(r.input_date),
-    }));
-  },
-  async addAdjust(payload) {
-    const jenis=payload.jenis||'Adjustment';
-    const prefix=jenis==='Pemusnahan'?'PMS':'ADJ';
-    const now=new Date();
-    const pad=n=>String(n).padStart(2,'0');
-    const adjId=`${prefix}_${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-    let lampiran=[];
-    if(payload.files&&payload.files.length) {
-      for(const f of payload.files) {
-        const r=await API._uploadFile(f.data,f.name,f.type,jenis.toLowerCase());
-        if(r.url) lampiran.push({name:f.name,url:r.url});
-      }
-    }
-    const {data,error}=await _sb.from('adjustments').insert({
-      adj_id:adjId, bulan:parseInt(payload.bulan), tahun:parseInt(payload.tahun),
-      no_sistem:payload.noSistem, keterangan:payload.keterangan,
-      jenis, area:payload.area, lampiran,
-    }).select().single();
-    if(error) throw error;
-    return {success:true, adjId, data};
-  },
-  async updateAdjust(id, payload) {
-    const {error}=await _sb.from('adjustments').update({
-      bulan:parseInt(payload.bulan), tahun:parseInt(payload.tahun),
-      no_sistem:payload.noSistem, keterangan:payload.keterangan,
-      jenis:payload.jenis, area:payload.area, lampiran:payload.lampiran||[],
-    }).eq('id',id);
-    if(error) throw error;
-    return {success:true};
-  },
-  async deleteAdjust(id) {
-    await _sb.from('adjustments').delete().eq('id',id);
-    return {success:true};
-  },
-
-  // HOLIDAYS
-  async getHolidays() {
-    const {data}=await _sb.from('holidays').select('*');
-    const obj={};
-    (data||[]).forEach(r=>{obj[r.date_key]={type:r.type,label:r.label};});
-    return obj;
-  },
-  async saveHolidays(token, holidaysObj) {
-    const rows=Object.entries(holidaysObj).map(([date_key,v])=>({date_key,label:v.label,type:v.type||'nasional'}));
-    if(rows.length) await _sb.from('holidays').upsert(rows,{onConflict:'date_key'});
-    return {success:true};
-  },
-  async deleteHoliday(dateKey) {
-    await _sb.from('holidays').delete().eq('date_key',dateKey);
-    return {success:true};
-  },
-  async fetchNationalHolidays(token, year) {
-    const DATA={
-      2026:[['2026-01-01','Tahun Baru 2026'],['2026-01-16','Isra Miraj Nabi Muhammad SAW'],['2026-01-17','Tahun Baru Imlek 2577'],['2026-03-19','Hari Suci Nyepi Tahun Baru Saka 1948'],['2026-03-20','Wafat Isa Almasih'],['2026-03-26','Idulfitri 1447 H (Hari 1)'],['2026-03-27','Idulfitri 1447 H (Hari 2)'],['2026-03-23','Cuti Bersama Idulfitri'],['2026-03-24','Cuti Bersama Idulfitri'],['2026-03-25','Cuti Bersama Idulfitri'],['2026-03-28','Cuti Bersama Idulfitri'],['2026-05-01','Hari Buruh Internasional'],['2026-05-14','Kenaikan Isa Almasih'],['2026-05-26','Hari Raya Waisak 2570 BE'],['2026-06-01','Hari Lahir Pancasila'],['2026-06-17','Hari Raya Iduladha 1447 H'],['2026-07-01','Tahun Baru Islam 1448 H'],['2026-08-17','Hari Kemerdekaan RI'],['2026-09-25','Maulid Nabi Muhammad SAW'],['2026-12-25','Hari Raya Natal']],
-      2027:[['2027-01-01','Tahun Baru 2027'],['2027-01-06','Isra Miraj Nabi Muhammad SAW'],['2027-01-19','Tahun Baru Imlek 2578'],['2027-03-09','Hari Suci Nyepi Tahun Baru Saka 1949'],['2027-03-18','Idulfitri 1448 H (Hari 1)'],['2027-03-19','Idulfitri 1448 H (Hari 2)'],['2027-04-02','Wafat Isa Almasih'],['2027-05-01','Hari Buruh Internasional'],['2027-05-13','Kenaikan Isa Almasih'],['2027-05-24','Hari Raya Waisak 2571 BE'],['2027-05-27','Hari Raya Iduladha 1448 H'],['2027-06-01','Hari Lahir Pancasila'],['2027-06-16','Tahun Baru Islam 1449 H'],['2027-08-17','Hari Kemerdekaan RI'],['2027-08-25','Maulid Nabi Muhammad SAW'],['2027-12-25','Hari Raya Natal']],
-    };
-    const entries=DATA[year]||[];
-    if(!entries.length) return {success:false,message:`Data ${year} belum tersedia`};
-    const existing=await API.getHolidays();
-    let added=0,updated=0;
-    for(const[dk,label]of entries){
-      const d=new Date(dk); if(d.getDay()===0||d.getDay()===6) continue;
-      if(!existing[dk]){existing[dk]={type:'nasional',label};added++;}
-      else if(existing[dk].type==='nasional'){existing[dk].label=label;updated++;}
-    }
-    await API.saveHolidays(null,existing);
-    return {success:true,added,updated,total:entries.length,year,source:'Data Lokal (SKB 3 Menteri)'};
-  },
-
-  // PENDING TRANSIT
-  async getAllPendingTransit() {
-    const {data,error}=await _sb.from('pending_transit').select('*').order('tahun').order('bulan').order('area');
-    if(error) throw error;
-    return data.map((r,i)=>({
-      rowIndex:i+2, id:r.id, ptId:r.pt_id, area:r.area,
-      bulan:r.bulan, tahun:r.tahun, done:r.done, pending:r.pending, pct:r.pct,
-      catatan:r.catatan||'', inputDate:_fmtDate(r.input_date), updatedAt:_fmtDate(r.updated_at),
-    }));
-  },
-  async addPendingTransit(payload) {
-    const done=parseInt(payload.done)||0, pending=parseInt(payload.pending)||0;
-    const pct=(done+pending)>0?Math.round(done/(done+pending)*100):0;
-    const ptId='PT-'+Date.now();
-    const {data,error}=await _sb.from('pending_transit').insert({
-      pt_id:ptId, area:payload.area, bulan:parseInt(payload.bulan),
-      tahun:parseInt(payload.tahun), done, pending, pct, catatan:payload.catatan||'',
-    }).select().single();
-    if(error) throw error;
-    return {success:true, ptId};
-  },
-  async updatePendingTransit(id, payload) {
-    const done=parseInt(payload.done)||0, pending=parseInt(payload.pending)||0;
-    const pct=(done+pending)>0?Math.round(done/(done+pending)*100):0;
-    const {error}=await _sb.from('pending_transit').update({
-      area:payload.area, bulan:parseInt(payload.bulan), tahun:parseInt(payload.tahun),
-      done, pending, pct, catatan:payload.catatan||'',
-    }).eq('id',id);
-    if(error) throw error;
-    return {success:true};
-  },
-  async deletePendingTransit(id) {
-    await _sb.from('pending_transit').delete().eq('id',id);
-    return {success:true};
-  },
-
-  // FILE UPLOAD (Supabase Storage)
-  async uploadFileToDriveByJenis(b64, fileName, mimeType, docId, jenis) {
-    return API._uploadFile(b64, fileName, mimeType, jenis.toLowerCase());
-  },
-  async uploadFileToDrive(b64, fileName, mimeType, caseNo) {
-    return API._uploadFile(b64, fileName, mimeType, 'issues');
-  },
-  async _uploadFile(b64, fileName, mimeType, folder='issues') {
-    try {
-      const base64 = b64.includes(',') ? b64.split(',')[1] : b64;
-      const bin = atob(base64), arr = new Uint8Array(bin.length);
-      for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
-      const blob = new Blob([arr],{type:mimeType});
-      const path = `${folder}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
-      const {error} = await _sb.storage.from('ccfa-attachments').upload(path, blob, {contentType:mimeType});
-      if(error) throw error;
-      const {data:{publicUrl}} = _sb.storage.from('ccfa-attachments').getPublicUrl(path);
-      return {success:true, fileUrl:publicUrl, fileName};
-    } catch(e) {
-      console.error('Upload error:', e);
-      return {success:false, message:e.message};
-    }
-  },
-};
-
-// ── google.script.run compatibility shim ───────────────────────
-// Ubah: google.script.run.withSuccessHandler(fn).withFailureHandler(fn2).method(args)
-// Menjadi: API.method(args).then(fn).catch(fn2)
-;(function() {
-  function makeChain(methodName, args) {
-    let _sh=null, _fh=null;
-    const promise = (API[methodName]||(() => Promise.reject(new Error(`API.${methodName} not found`))))(...args);
-    promise.then(r=>{if(_sh)_sh(r);}).catch(e=>{if(_fh)_fh(e);else console.error(methodName,e);});
-    const chain = {
-      withSuccessHandler(fn){_sh=fn; return chain;},
-      withFailureHandler(fn){_fh=fn; return chain;},
-    };
-    return chain;
-  }
-
-  const handler = {
-    _sh:null, _fh:null,
-    withSuccessHandler(fn){ const c=Object.create(this); c._sh=fn; return c; },
-    withFailureHandler(fn){ const c=Object.create(this); c._fh=fn; return c; },
-  };
-  const methods = ['login','logout','saveAvatar','getAllIssues','addIssue','updateIssue','deleteIssue',
-    'getAllBinIssues','restoreFromBin','permanentDeleteFromBin','emptyRecycleBin',
-    'getAllAdjust','addAdjust','updateAdjust','deleteAdjust',
-    'getHolidays','saveHolidays','deleteHoliday','fetchNationalHolidays',
-    'getAllPendingTransit','addPendingTransit','updatePendingTransit','deletePendingTransit',
-    'uploadFileToDrive','uploadFileToDriveByJenis'];
-
-  methods.forEach(m => {
-    handler[m] = function(...args) {
-      const sh=this._sh, fh=this._fh;
-      (API[m]||(() => Promise.reject(new Error(`API.${m} not found`))))(...args)
-        .then(r=>{ if(sh) sh(r); })
-        .catch(e=>{ if(fh) fh(e); else console.error(m, e); });
-    };
-  });
-
-  window.google = { script: { run: handler } };
-})();
-
-// ── Auto-restore session dari Supabase Auth ─────────────────────
-window.addEventListener('load', async () => {
-  try {
-    const { data: { session } } = await _sb.auth.getSession();
-    if (session) {
-      const { data: prof } = await _sb.from('profiles').select('*').eq('id', session.user.id).single();
-      if (prof) {
-        currentSession = {
-          token: session.access_token,
-          user: { id: prof.user_id, displayName: prof.display_name, role: prof.role, avatar: prof.avatar_base64||'' }
-        };
-        updateHolidayBtnVisibility();
-        showApp();
-        return;
-      }
-    }
-  } catch(e) { console.warn('Session restore error:', e); }
-  document.getElementById('login-page').classList.add('active');
-  document.getElementById('splash')?.classList.add('hidden');
-});
-
 // ===================== STATE =====================
 let allIssues = [];
 let binIssues = [];
@@ -2853,8 +2523,19 @@ function goToAreaPageFiltered(area, status) {
 }
 
 // ===================== LOGIN =====================
-// window.onload digantikan oleh Supabase bridge (window load event)
-// yang restore session dari Supabase Auth secara async
+window.onload = function() {
+  // Try restore session from sessionStorage
+  const saved = sessionStorage.getItem('ccfa_session');
+  if (saved) {
+    try {
+      currentSession = JSON.parse(saved);
+      updateHolidayBtnVisibility();
+      showApp();
+      return;
+    } catch(e) {}
+  }  // Show login
+  document.getElementById('login-page').classList.add('active');
+};
 
 function togglePw() {
   const inp = document.getElementById('login-pw');
@@ -2889,6 +2570,7 @@ function doLogin() {
       if (res.success) {
         currentSession = { token: res.token, user: res.user };
         updateHolidayBtnVisibility();
+        sessionStorage.setItem('ccfa_session', JSON.stringify(currentSession));
         showApp();
       } else {
         document.getElementById('login-error-msg').textContent = res.message || 'Login gagal';
@@ -2965,6 +2647,7 @@ function doLogout() {
     google.script.run.logout(currentSession.token);
   }
   currentSession = null;
+  sessionStorage.removeItem('ccfa_session');
   // Reset mood
   const badge = document.getElementById('nav-mood-badge');
   if (badge) { badge.style.display = 'none'; badge.textContent = ''; }
@@ -6714,6 +6397,166 @@ async function downloadDashboardPPT(themeKey) {
 }
 
 
+</script>
+
+<!-- PAGE KPI -->
+<div class="page" id="page-kpi">
+  <div style="padding:20px 24px;max-width:1400px;margin:0 auto;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+      <div style="width:42px;height:42px;background:linear-gradient(135deg,#0ea5e9,#6366f1);border-radius:12px;display:flex;align-items:center;justify-content:center;"><i class="ti ti-chart-bar" style="color:#fff;font-size:20px"></i></div>
+      <div>
+        <div style="font-size:18px;font-weight:700;color:var(--text)">KPI Finance &amp; Accounting</div>
+        <div style="font-size:12px;color:var(--text2)">Input nilai untuk kalkulasi otomatis</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;">
+        <button onclick="kpiClearAll()" style="padding:7px 14px;background:var(--bg);border:1px solid var(--border);border-radius:9px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;"><i class="ti ti-trash" style="font-size:12px"></i> Reset</button>
+        <button onclick="kpiSaveAll()" style="padding:7px 14px;background:#3b82f6;border:none;border-radius:9px;font-size:12px;color:#fff;cursor:pointer;font-family:inherit;font-weight:600;"><i class="ti ti-device-floppy" style="font-size:12px"></i> Simpan</button>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <!-- 1. DMCR -->
+      <div class="kpi-card">
+        <div class="kpi-card-head"><div class="kpi-card-icon" style="background:rgba(14,165,233,.15);">💰</div><div><div class="kpi-card-title">Direct Material Cost Ratio</div><div class="kpi-card-formula">Bahan Baku / Revenue × 100% (At Standard Cost)</div></div></div>
+        <div class="kpi-card-body">
+          <div class="kpi-input-row">
+            <div class="kpi-input-group"><label>Bahan Baku (Rp)</label><input type="number" id="kpi-dmcr-bb" placeholder="0" oninput="calcDMCR()" min="0"></div>
+            <div class="kpi-input-group"><label>Revenue (Rp)</label><input type="number" id="kpi-dmcr-rev" placeholder="0" oninput="calcDMCR()" min="0"></div>
+            <div class="kpi-input-group" style="max-width:140px"><label>Periode</label><input type="month" id="kpi-dmcr-period"></div>
+          </div>
+          <div class="kpi-result"><div><div class="kpi-result-label">Hasil</div><div class="kpi-result-value" id="kpi-dmcr-val" style="color:var(--text2)">—</div></div><span class="kpi-result-badge" id="kpi-dmcr-badge"></span></div>
+          <div class="kpi-history"><div class="kpi-history-title">Riwayat</div><table class="kpi-history-table"><thead><tr><th>Periode</th><th>Bahan Baku</th><th>Revenue</th><th>Ratio</th><th>Status</th></tr></thead><tbody id="kpi-dmcr-history"></tbody></table></div>
+        </div>
+      </div>
+      <!-- 2. IWR -->
+      <div class="kpi-card">
+        <div class="kpi-card-head"><div class="kpi-card-icon" style="background:rgba(239,68,68,.15);">📦</div><div><div class="kpi-card-title">Inventory Write-Off Ratio</div><div class="kpi-card-formula">Nilai Write-Off / Avg Inventory × 100%</div></div></div>
+        <div class="kpi-card-body">
+          <div class="kpi-input-row">
+            <div class="kpi-input-group"><label>Nilai Write-Off (Rp)</label><input type="number" id="kpi-iwr-writeoff" placeholder="0" oninput="calcIWR()" min="0"></div>
+            <div class="kpi-input-group"><label>Avg Inventory (Rp)</label><input type="number" id="kpi-iwr-avginv" placeholder="0" oninput="calcIWR()" min="0"></div>
+            <div class="kpi-input-group" style="max-width:140px"><label>Periode</label><input type="month" id="kpi-iwr-period"></div>
+          </div>
+          <div class="kpi-input-row" style="margin-bottom:0"><div class="kpi-input-group"><label>Keterangan</label><input type="text" id="kpi-iwr-ket" placeholder="slow-moving, expired, dll"></div></div>
+          <div class="kpi-result" style="margin-top:14px"><div><div class="kpi-result-label">Hasil</div><div class="kpi-result-value" id="kpi-iwr-val" style="color:var(--text2)">—</div></div><span class="kpi-result-badge" id="kpi-iwr-badge"></span></div>
+          <div class="kpi-history"><div class="kpi-history-title">Riwayat</div><table class="kpi-history-table"><thead><tr><th>Periode</th><th>Write-Off</th><th>Avg Inv</th><th>Ratio</th><th>Status</th></tr></thead><tbody id="kpi-iwr-history"></tbody></table></div>
+        </div>
+      </div>
+      <!-- 3. PR -->
+      <div class="kpi-card">
+        <div class="kpi-card-head"><div class="kpi-card-icon" style="background:rgba(16,185,129,.15);">🏷️</div><div><div class="kpi-card-title">Pricing Realization</div><div class="kpi-card-formula">Avg Selling Price Actual / List Price × 100%</div></div></div>
+        <div class="kpi-card-body">
+          <div class="kpi-input-row">
+            <div class="kpi-input-group"><label>Avg Selling Price Actual (Rp)</label><input type="number" id="kpi-pr-actual" placeholder="0" oninput="calcPR()" min="0"></div>
+            <div class="kpi-input-group"><label>List Price (Rp)</label><input type="number" id="kpi-pr-list" placeholder="0" oninput="calcPR()" min="0"></div>
+            <div class="kpi-input-group" style="max-width:140px"><label>Periode</label><input type="month" id="kpi-pr-period"></div>
+          </div>
+          <div class="kpi-result"><div><div class="kpi-result-label">Hasil</div><div class="kpi-result-value" id="kpi-pr-val" style="color:var(--text2)">—</div></div><span class="kpi-result-badge" id="kpi-pr-badge"></span></div>
+          <div class="kpi-history"><div class="kpi-history-title">Riwayat</div><table class="kpi-history-table"><thead><tr><th>Periode</th><th>Actual Price</th><th>List Price</th><th>Realisasi</th><th>Status</th></tr></thead><tbody id="kpi-pr-history"></tbody></table></div>
+        </div>
+      </div>
+      <!-- 4. COGS Variance -->
+      <div class="kpi-card">
+        <div class="kpi-card-head"><div class="kpi-card-icon" style="background:rgba(245,158,11,.15);">📊</div><div><div class="kpi-card-title">COGS Variance vs Standard</div><div class="kpi-card-formula">(Actual COGS − Standard COGS) / Standard COGS × 100%</div></div></div>
+        <div class="kpi-card-body">
+          <div class="kpi-input-row">
+            <div class="kpi-input-group"><label>Actual COGS (Rp)</label><input type="number" id="kpi-cv-actual" placeholder="0" oninput="calcCV()" min="0"></div>
+            <div class="kpi-input-group"><label>Standard COGS (Rp)</label><input type="number" id="kpi-cv-standard" placeholder="0" oninput="calcCV()" min="0"></div>
+            <div class="kpi-input-group" style="max-width:140px"><label>Periode</label><input type="month" id="kpi-cv-period"></div>
+          </div>
+          <div class="kpi-sub-label">Pisah Variance (opsional)</div>
+          <div class="kpi-sub-row">
+            <div class="kpi-input-group"><label>Price Variance (Rp)</label><input type="number" id="kpi-cv-price" placeholder="0" oninput="calcCV()"></div>
+            <div class="kpi-input-group"><label>Usage Variance (Rp)</label><input type="number" id="kpi-cv-usage" placeholder="0" oninput="calcCV()"></div>
+            <div class="kpi-input-group"><label>Mix Variance (Rp)</label><input type="number" id="kpi-cv-mix" placeholder="0" oninput="calcCV()"></div>
+          </div>
+          <div class="kpi-result">
+            <div style="flex:1"><div class="kpi-result-label">Total Variance</div><div class="kpi-result-value" id="kpi-cv-val" style="color:var(--text2)">—</div><div id="kpi-cv-breakdown" style="margin-top:8px;font-size:11px;color:var(--text2);display:flex;gap:14px;flex-wrap:wrap;"></div></div>
+            <span class="kpi-result-badge" id="kpi-cv-badge"></span>
+          </div>
+          <div class="kpi-history"><div class="kpi-history-title">Riwayat</div><table class="kpi-history-table"><thead><tr><th>Periode</th><th>Actual</th><th>Standard</th><th>Variance</th><th>Price</th><th>Usage</th><th>Mix</th></tr></thead><tbody id="kpi-cv-history"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let kpiData=JSON.parse(localStorage.getItem('kpi_data')||'{"dmcr":[],"iwr":[],"pr":[],"cv":[]}');
+function _kpiFmt(n){return Number(n).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})+'%';}
+function _kpiRp(n){return 'Rp '+Number(n).toLocaleString('id-ID');}
+function _kpiBadge(el,t,c){el.textContent=t;el.className='kpi-result-badge kpi-badge-'+c;}
+function calcDMCR(){
+  const bb=+document.getElementById('kpi-dmcr-bb').value||0,rev=+document.getElementById('kpi-dmcr-rev').value||0;
+  const el=document.getElementById('kpi-dmcr-val'),bg=document.getElementById('kpi-dmcr-badge');
+  if(!bb||!rev){el.textContent='—';el.style.color='var(--text2)';bg.textContent='';return;}
+  const r=bb/rev*100;el.textContent=_kpiFmt(r);el.style.color=r<=40?'#10b981':r<=60?'#f59e0b':'#ef4444';
+  if(r<=40)_kpiBadge(bg,'Efisien','good');else if(r<=60)_kpiBadge(bg,'Perhatian','warn');else _kpiBadge(bg,'Tinggi','bad');
+}
+function calcIWR(){
+  const wo=+document.getElementById('kpi-iwr-writeoff').value||0,avg=+document.getElementById('kpi-iwr-avginv').value||0;
+  const el=document.getElementById('kpi-iwr-val'),bg=document.getElementById('kpi-iwr-badge');
+  if(!wo||!avg){el.textContent='—';el.style.color='var(--text2)';bg.textContent='';return;}
+  const r=wo/avg*100;el.textContent=_kpiFmt(r);el.style.color=r<=1?'#10b981':r<=3?'#f59e0b':'#ef4444';
+  if(r<=1)_kpiBadge(bg,'Baik','good');else if(r<=3)_kpiBadge(bg,'Perhatian','warn');else _kpiBadge(bg,'Tinggi','bad');
+}
+function calcPR(){
+  const act=+document.getElementById('kpi-pr-actual').value||0,lst=+document.getElementById('kpi-pr-list').value||0;
+  const el=document.getElementById('kpi-pr-val'),bg=document.getElementById('kpi-pr-badge');
+  if(!act||!lst){el.textContent='—';el.style.color='var(--text2)';bg.textContent='';return;}
+  const r=act/lst*100;el.textContent=_kpiFmt(r);el.style.color=r>=95?'#10b981':r>=85?'#f59e0b':'#ef4444';
+  if(r>=95)_kpiBadge(bg,'Optimal','good');else if(r>=85)_kpiBadge(bg,'Perhatian','warn');else _kpiBadge(bg,'Rendah','bad');
+}
+function calcCV(){
+  const ca=+document.getElementById('kpi-cv-actual').value||0,cs=+document.getElementById('kpi-cv-standard').value||0;
+  const pv=+document.getElementById('kpi-cv-price').value||0,uv=+document.getElementById('kpi-cv-usage').value||0,mv=+document.getElementById('kpi-cv-mix').value||0;
+  const el=document.getElementById('kpi-cv-val'),bg=document.getElementById('kpi-cv-badge'),bd=document.getElementById('kpi-cv-breakdown');
+  if(!ca||!cs){el.textContent='—';el.style.color='var(--text2)';bg.textContent='';bd.innerHTML='';return;}
+  const r=(ca-cs)/cs*100;el.textContent=(r>=0?'+':'')+_kpiFmt(r);el.style.color=r<=0?'#10b981':r<=5?'#f59e0b':'#ef4444';
+  if(r<=0)_kpiBadge(bg,'Favorable','good');else if(r<=5)_kpiBadge(bg,'Perhatian','warn');else _kpiBadge(bg,'Unfavorable','bad');
+  const pts=[];
+  if(pv)pts.push(`<span>Price: <b style="color:${pv>0?'#ef4444':'#10b981'}">${pv>0?'+':''}${_kpiRp(pv)}</b></span>`);
+  if(uv)pts.push(`<span>Usage: <b style="color:${uv>0?'#ef4444':'#10b981'}">${uv>0?'+':''}${_kpiRp(uv)}</b></span>`);
+  if(mv)pts.push(`<span>Mix: <b style="color:${mv>0?'#ef4444':'#10b981'}">${mv>0?'+':''}${_kpiRp(mv)}</b></span>`);
+  bd.innerHTML=pts.join('');
+}
+function kpiSaveAll(){
+  const now=new Date().toLocaleDateString('id-ID');
+  const g=id=>+document.getElementById(id).value||0,s=id=>document.getElementById(id).value||now;
+  const sc=(v,a,b)=>v<=a?'good':v<=b?'warn':'bad';
+  const bb=g('kpi-dmcr-bb'),rev=g('kpi-dmcr-rev');
+  if(bb&&rev){const r=(bb/rev*100).toFixed(2);kpiData.dmcr.unshift({period:s('kpi-dmcr-period'),bb,rev,ratio:r,status:r<=40?'Efisien':r<=60?'Perhatian':'Tinggi'});if(kpiData.dmcr.length>12)kpiData.dmcr.pop();}
+  const wo=g('kpi-iwr-writeoff'),avg=g('kpi-iwr-avginv');
+  if(wo&&avg){const r=(wo/avg*100).toFixed(2);kpiData.iwr.unshift({period:s('kpi-iwr-period'),wo,avg,ratio:r,ket:document.getElementById('kpi-iwr-ket').value,status:r<=1?'Baik':r<=3?'Perhatian':'Tinggi'});if(kpiData.iwr.length>12)kpiData.iwr.pop();}
+  const act=g('kpi-pr-actual'),lst=g('kpi-pr-list');
+  if(act&&lst){const r=(act/lst*100).toFixed(2);kpiData.pr.unshift({period:s('kpi-pr-period'),actual:act,list:lst,ratio:r,status:r>=95?'Optimal':r>=85?'Perhatian':'Rendah'});if(kpiData.pr.length>12)kpiData.pr.pop();}
+  const ca=g('kpi-cv-actual'),cs=g('kpi-cv-standard');
+  if(ca&&cs){const r=((ca-cs)/cs*100).toFixed(2);kpiData.cv.unshift({period:s('kpi-cv-period'),actual:ca,std:cs,variance:r,price:g('kpi-cv-price'),usage:g('kpi-cv-usage'),mix:g('kpi-cv-mix'),status:r<=0?'Favorable':r<=5?'Perhatian':'Unfavorable'});if(kpiData.cv.length>12)kpiData.cv.pop();}
+  localStorage.setItem('kpi_data',JSON.stringify(kpiData));
+  kpiRenderHistories();
+  toast('KPI berhasil disimpan','success');
+}
+function kpiClearAll(){
+  ['kpi-dmcr-bb','kpi-dmcr-rev','kpi-dmcr-period','kpi-iwr-writeoff','kpi-iwr-avginv','kpi-iwr-period','kpi-iwr-ket','kpi-pr-actual','kpi-pr-list','kpi-pr-period','kpi-cv-actual','kpi-cv-standard','kpi-cv-period','kpi-cv-price','kpi-cv-usage','kpi-cv-mix']
+    .forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['kpi-dmcr-val','kpi-iwr-val','kpi-pr-val','kpi-cv-val'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent='—';el.style.color='var(--text2)';}});
+  ['kpi-dmcr-badge','kpi-iwr-badge','kpi-pr-badge','kpi-cv-badge'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='';});
+  const bd=document.getElementById('kpi-cv-breakdown');if(bd)bd.innerHTML='';
+}
+function kpiRenderHistories(){
+  const fmt=n=>Number(n).toLocaleString('id-ID');
+  const sc=s=>({'Favorable':'#10b981','Optimal':'#10b981','Efisien':'#10b981','Baik':'#10b981','Perhatian':'#f59e0b'}[s]||'#ef4444');
+  const empty=n=>`<tr><td colspan="${n}" style="text-align:center;color:var(--text2)">Belum ada data</td></tr>`;
+  const tb=id=>document.getElementById(id);
+  if(tb('kpi-dmcr-history'))tb('kpi-dmcr-history').innerHTML=kpiData.dmcr.length?kpiData.dmcr.map(r=>`<tr><td>${r.period}</td><td>${fmt(r.bb)}</td><td>${fmt(r.rev)}</td><td><b>${r.ratio}%</b></td><td style="color:${sc(r.status)}">${r.status}</td></tr>`).join(''):empty(5);
+  if(tb('kpi-iwr-history'))tb('kpi-iwr-history').innerHTML=kpiData.iwr.length?kpiData.iwr.map(r=>`<tr><td>${r.period}</td><td>${fmt(r.wo)}</td><td>${fmt(r.avg)}</td><td><b>${r.ratio}%</b></td><td style="color:${sc(r.status)}">${r.status}</td></tr>`).join(''):empty(5);
+  if(tb('kpi-pr-history'))tb('kpi-pr-history').innerHTML=kpiData.pr.length?kpiData.pr.map(r=>`<tr><td>${r.period}</td><td>${fmt(r.actual)}</td><td>${fmt(r.list)}</td><td><b>${r.ratio}%</b></td><td style="color:${sc(r.status)}">${r.status}</td></tr>`).join(''):empty(5);
+  if(tb('kpi-cv-history'))tb('kpi-cv-history').innerHTML=kpiData.cv.length?kpiData.cv.map(r=>`<tr><td>${r.period}</td><td>${fmt(r.actual)}</td><td>${fmt(r.std)}</td><td><b style="color:${sc(r.status)}">${r.variance>=0?'+':''}${r.variance}%</b></td><td>${r.price?fmt(r.price):'—'}</td><td>${r.usage?fmt(r.usage):'—'}</td><td>${r.mix?fmt(r.mix):'—'}</td></tr>`).join(''):empty(7);
+}
+// Hook sidebarNav
+document.addEventListener('DOMContentLoaded',()=>{
+  const orig=window.sidebarNav;
+  if(orig) window.sidebarNav=function(p){orig(p);if(p==='kpi')kpiRenderHistories();};
+});
 </script>
 </body>
 </html>
