@@ -2,6 +2,12 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+  <script>
+    /* ★ GANTI dengan nilai Supabase project kamu ★ */
+    window.__SB_URL  = 'https://uwlychyfkzrkwxrezaad.supabase.co';
+    window.__SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3bHljaHlma3pya3d4cmV6YWFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0OTk0NjMsImV4cCI6MjA5NzA3NTQ2M30.0dwQpKZ5m1XBjp3TV2lNPXzet32g7aYvG7gj3B8O0Eg';
+  </script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Issue Report CC-FA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2415,6 +2421,364 @@ html { -webkit-text-size-adjust: 100%; }
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
+// ══════════════════════════════════════════════════════════════
+// SUPABASE BRIDGE — menggantikan google.script.run
+// ══════════════════════════════════════════════════════════════
+const _sb = window.supabase.createClient(window.__SB_URL, window.__SB_ANON);
+
+// ── Helpers ────────────────────────────────────────────────────
+function _fmtDate(s) {
+  if (!s) return '';
+  const d = new Date(s);
+  if (isNaN(d)) return '';
+  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+}
+function _toISO(s) {
+  if (!s || s instanceof Date) return s ? s.toISOString().split('T')[0] : null;
+  const p = s.includes('/') ? s.split('/') : null;
+  if (p && p.length===3) return `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+  return s.split('T')[0];
+}
+function _parseDate(s) {
+  if (!s) return new Date();
+  if (s instanceof Date) return s;
+  const p = s.split('/');
+  return p.length===3 ? new Date(`${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`) : new Date(s);
+}
+function _countWD(start, end, hols={}) {
+  let n=0; const c=new Date(start); c.setHours(0,0,0,0); const e=new Date(end); e.setHours(23,59,59,0);
+  while(c<=e){const dw=c.getDay(); if(dw>0&&dw<6){const k=c.toISOString().split('T')[0]; if(!hols[k])n++;} c.setDate(c.getDate()+1);}
+  return n;
+}
+function _genCaseNo(area, date, existing=[]) {
+  const R=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+  const m=date.getMonth()+1, yr=String(date.getFullYear()).slice(-2);
+  const rom=R[m-1], pfx=area==='Tecno'?'Tecno':'DKE';
+  const re=new RegExp(`/SO-${pfx}/${rom}/${yr}$`);
+  const seq=(existing||[]).filter(c=>c&&re.test(c)).length+1;
+  return `${String(seq).padStart(3,'0')}/SO-${pfx}/${rom}/${yr}`;
+}
+
+// ── API object ──────────────────────────────────────────────────
+const API = {
+
+  // AUTH
+  async login(userId, password) {
+    // Terima format: 'Admin' → 'admin@ccfa.co.id'
+    // atau email lengkap: 'admin@ccfa.co.id' → pakai langsung
+    const DOMAIN = '@ccfa.co.id';
+    const raw = userId.trim();
+    const email = raw.includes('@') ? raw.toLowerCase() : raw.toLowerCase() + DOMAIN;
+    const { data, error } = await _sb.auth.signInWithPassword({ email, password });
+    if (error) return { success:false, message:'ID atau Password salah' };
+    const { data:prof } = await _sb.from('profiles').select('*').eq('id',data.user.id).single();
+    return { success:true,
+      token: data.session.access_token,
+      user: { id:prof.user_id, displayName:prof.display_name, role:prof.role, avatar:prof.avatar_base64||'' }
+    };
+  },
+  async logout(token) { await _sb.auth.signOut(); return {success:true}; },
+  async saveAvatar(token, b64) {
+    const { data:{user} } = await _sb.auth.getUser();
+    if (!user) return {success:false};
+    await _sb.from('profiles').update({avatar_base64:b64}).eq('id',user.id);
+    return {success:true};
+  },
+
+  // ISSUES
+  async getAllIssues() {
+    const {data,error} = await _sb.from('issues').select('*').order('input_date',{ascending:false});
+    if(error) throw error;
+    return data.map((r,i)=>({
+      rowIndex:i+2, id:r.id, caseNo:r.case_no,
+      inputDate:_fmtDate(r.input_date), area:r.area,
+      description:r.description, status:r.status,
+      resolution:r.resolution||'', doneDate:_fmtDate(r.done_date),
+      workDays:r.work_days||'', attachments:r.attachments||[],
+      inputMonth:r.input_month, inputYear:r.input_year,
+    }));
+  },
+  async addIssue(payload) {
+    const inputDate = _parseDate(payload.inputDate);
+    const {data:ex} = await _sb.from('issues').select('case_no');
+    const caseNo = _genCaseNo(payload.area, inputDate, (ex||[]).map(r=>r.case_no));
+    let doneDate=null, workDays=null;
+    if (payload.status==='Done'&&payload.doneDate) {
+      doneDate=_toISO(_parseDate(payload.doneDate));
+      const hols=await API.getHolidays();
+      workDays=_countWD(inputDate,_parseDate(payload.doneDate),hols);
+    }
+    const {data,error} = await _sb.from('issues').insert({
+      case_no:caseNo, input_date:_toISO(inputDate), area:payload.area,
+      description:payload.description, status:payload.status||'Open',
+      resolution:payload.resolution||'', done_date:doneDate, work_days:workDays,
+      attachments:payload.attachments||[], input_month:inputDate.getMonth()+1,
+      input_year:inputDate.getFullYear(),
+    }).select().single();
+    if(error) throw error;
+    return {success:true, caseNo, data};
+  },
+  async updateIssue(id, payload) {
+    const upd={};
+    if(payload.area)                    upd.area=payload.area;
+    if(payload.description)             upd.description=payload.description;
+    if(payload.status)                  upd.status=payload.status;
+    if(payload.resolution!==undefined)  upd.resolution=payload.resolution;
+    if(payload.attachments)             upd.attachments=payload.attachments;
+    if(payload.inputDate) {
+      const d=_parseDate(payload.inputDate);
+      upd.input_date=_toISO(d); upd.input_month=d.getMonth()+1; upd.input_year=d.getFullYear();
+    }
+    // Done date & work days
+    let dDate = payload.doneDate ? _parseDate(payload.doneDate) : null;
+    if(payload.status==='Done' && !dDate) dDate=new Date();
+    if(dDate) {
+      upd.done_date=_toISO(dDate);
+      const hols=await API.getHolidays();
+      const startD = payload.inputDate ? _parseDate(payload.inputDate) : new Date(upd.input_date||Date.now());
+      upd.work_days=_countWD(startD, dDate, hols);
+    }
+    if(payload.status && payload.status!=='Done') { upd.done_date=null; upd.work_days=null; }
+    const {error}=await _sb.from('issues').update(upd).eq('id',id);
+    if(error) throw error;
+    return {success:true};
+  },
+  async deleteIssue(id) {
+    const {data:iss}=await _sb.from('issues').select('*').eq('id',id).single();
+    if(iss) await _sb.from('issues_bin').insert({...iss, original_id:iss.id, id:undefined, deleted_at:new Date().toISOString()});
+    await _sb.from('issues').delete().eq('id',id);
+    return {success:true};
+  },
+
+  // BIN
+  async getAllBinIssues() {
+    const {data,error}=await _sb.from('issues_bin').select('*').order('deleted_at',{ascending:false});
+    if(error) throw error;
+    return data.map((r,i)=>({
+      binRowIndex:i, id:r.id, caseNo:r.case_no,
+      inputDate:_fmtDate(r.input_date), area:r.area,
+      description:r.description, status:r.status,
+      resolution:r.resolution||'', attachments:r.attachments||[],
+      deletedAt:_fmtDate(r.deleted_at),
+    }));
+  },
+  async restoreFromBin(id) {
+    const {data:item}=await _sb.from('issues_bin').select('*').eq('id',id).single();
+    if(!item) return {success:false};
+    const {original_id,deleted_at,id:_,... rest}=item;
+    await _sb.from('issues').upsert({...rest, id:original_id||undefined});
+    await _sb.from('issues_bin').delete().eq('id',id);
+    return {success:true};
+  },
+  async permanentDeleteFromBin(id) {
+    await _sb.from('issues_bin').delete().eq('id',id);
+    return {success:true};
+  },
+  async emptyRecycleBin() {
+    await _sb.from('issues_bin').delete().neq('id','00000000-0000-0000-0000-000000000000');
+    return {success:true};
+  },
+
+  // ADJUSTMENTS
+  async getAllAdjust() {
+    const {data,error}=await _sb.from('adjustments').select('*').order('input_date',{ascending:false});
+    if(error) throw error;
+    return data.map((r,i)=>({
+      rowIndex:i+2, id:r.id, adjId:r.adj_id, bulan:r.bulan, tahun:r.tahun,
+      noSistem:r.no_sistem, keterangan:r.keterangan, jenis:r.jenis,
+      area:r.area, lampiran:r.lampiran||[], inputDate:_fmtDate(r.input_date),
+    }));
+  },
+  async addAdjust(payload) {
+    const jenis=payload.jenis||'Adjustment';
+    const prefix=jenis==='Pemusnahan'?'PMS':'ADJ';
+    const now=new Date();
+    const pad=n=>String(n).padStart(2,'0');
+    const adjId=`${prefix}_${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    let lampiran=[];
+    if(payload.files&&payload.files.length) {
+      for(const f of payload.files) {
+        const r=await API._uploadFile(f.data,f.name,f.type,jenis.toLowerCase());
+        if(r.url) lampiran.push({name:f.name,url:r.url});
+      }
+    }
+    const {data,error}=await _sb.from('adjustments').insert({
+      adj_id:adjId, bulan:parseInt(payload.bulan), tahun:parseInt(payload.tahun),
+      no_sistem:payload.noSistem, keterangan:payload.keterangan,
+      jenis, area:payload.area, lampiran,
+    }).select().single();
+    if(error) throw error;
+    return {success:true, adjId, data};
+  },
+  async updateAdjust(id, payload) {
+    const {error}=await _sb.from('adjustments').update({
+      bulan:parseInt(payload.bulan), tahun:parseInt(payload.tahun),
+      no_sistem:payload.noSistem, keterangan:payload.keterangan,
+      jenis:payload.jenis, area:payload.area, lampiran:payload.lampiran||[],
+    }).eq('id',id);
+    if(error) throw error;
+    return {success:true};
+  },
+  async deleteAdjust(id) {
+    await _sb.from('adjustments').delete().eq('id',id);
+    return {success:true};
+  },
+
+  // HOLIDAYS
+  async getHolidays() {
+    const {data}=await _sb.from('holidays').select('*');
+    const obj={};
+    (data||[]).forEach(r=>{obj[r.date_key]={type:r.type,label:r.label};});
+    return obj;
+  },
+  async saveHolidays(token, holidaysObj) {
+    const rows=Object.entries(holidaysObj).map(([date_key,v])=>({date_key,label:v.label,type:v.type||'nasional'}));
+    if(rows.length) await _sb.from('holidays').upsert(rows,{onConflict:'date_key'});
+    return {success:true};
+  },
+  async deleteHoliday(dateKey) {
+    await _sb.from('holidays').delete().eq('date_key',dateKey);
+    return {success:true};
+  },
+  async fetchNationalHolidays(token, year) {
+    const DATA={
+      2026:[['2026-01-01','Tahun Baru 2026'],['2026-01-16','Isra Miraj Nabi Muhammad SAW'],['2026-01-17','Tahun Baru Imlek 2577'],['2026-03-19','Hari Suci Nyepi Tahun Baru Saka 1948'],['2026-03-20','Wafat Isa Almasih'],['2026-03-26','Idulfitri 1447 H (Hari 1)'],['2026-03-27','Idulfitri 1447 H (Hari 2)'],['2026-03-23','Cuti Bersama Idulfitri'],['2026-03-24','Cuti Bersama Idulfitri'],['2026-03-25','Cuti Bersama Idulfitri'],['2026-03-28','Cuti Bersama Idulfitri'],['2026-05-01','Hari Buruh Internasional'],['2026-05-14','Kenaikan Isa Almasih'],['2026-05-26','Hari Raya Waisak 2570 BE'],['2026-06-01','Hari Lahir Pancasila'],['2026-06-17','Hari Raya Iduladha 1447 H'],['2026-07-01','Tahun Baru Islam 1448 H'],['2026-08-17','Hari Kemerdekaan RI'],['2026-09-25','Maulid Nabi Muhammad SAW'],['2026-12-25','Hari Raya Natal']],
+      2027:[['2027-01-01','Tahun Baru 2027'],['2027-01-06','Isra Miraj Nabi Muhammad SAW'],['2027-01-19','Tahun Baru Imlek 2578'],['2027-03-09','Hari Suci Nyepi Tahun Baru Saka 1949'],['2027-03-18','Idulfitri 1448 H (Hari 1)'],['2027-03-19','Idulfitri 1448 H (Hari 2)'],['2027-04-02','Wafat Isa Almasih'],['2027-05-01','Hari Buruh Internasional'],['2027-05-13','Kenaikan Isa Almasih'],['2027-05-24','Hari Raya Waisak 2571 BE'],['2027-05-27','Hari Raya Iduladha 1448 H'],['2027-06-01','Hari Lahir Pancasila'],['2027-06-16','Tahun Baru Islam 1449 H'],['2027-08-17','Hari Kemerdekaan RI'],['2027-08-25','Maulid Nabi Muhammad SAW'],['2027-12-25','Hari Raya Natal']],
+    };
+    const entries=DATA[year]||[];
+    if(!entries.length) return {success:false,message:`Data ${year} belum tersedia`};
+    const existing=await API.getHolidays();
+    let added=0,updated=0;
+    for(const[dk,label]of entries){
+      const d=new Date(dk); if(d.getDay()===0||d.getDay()===6) continue;
+      if(!existing[dk]){existing[dk]={type:'nasional',label};added++;}
+      else if(existing[dk].type==='nasional'){existing[dk].label=label;updated++;}
+    }
+    await API.saveHolidays(null,existing);
+    return {success:true,added,updated,total:entries.length,year,source:'Data Lokal (SKB 3 Menteri)'};
+  },
+
+  // PENDING TRANSIT
+  async getAllPendingTransit() {
+    const {data,error}=await _sb.from('pending_transit').select('*').order('tahun').order('bulan').order('area');
+    if(error) throw error;
+    return data.map((r,i)=>({
+      rowIndex:i+2, id:r.id, ptId:r.pt_id, area:r.area,
+      bulan:r.bulan, tahun:r.tahun, done:r.done, pending:r.pending, pct:r.pct,
+      catatan:r.catatan||'', inputDate:_fmtDate(r.input_date), updatedAt:_fmtDate(r.updated_at),
+    }));
+  },
+  async addPendingTransit(payload) {
+    const done=parseInt(payload.done)||0, pending=parseInt(payload.pending)||0;
+    const pct=(done+pending)>0?Math.round(done/(done+pending)*100):0;
+    const ptId='PT-'+Date.now();
+    const {data,error}=await _sb.from('pending_transit').insert({
+      pt_id:ptId, area:payload.area, bulan:parseInt(payload.bulan),
+      tahun:parseInt(payload.tahun), done, pending, pct, catatan:payload.catatan||'',
+    }).select().single();
+    if(error) throw error;
+    return {success:true, ptId};
+  },
+  async updatePendingTransit(id, payload) {
+    const done=parseInt(payload.done)||0, pending=parseInt(payload.pending)||0;
+    const pct=(done+pending)>0?Math.round(done/(done+pending)*100):0;
+    const {error}=await _sb.from('pending_transit').update({
+      area:payload.area, bulan:parseInt(payload.bulan), tahun:parseInt(payload.tahun),
+      done, pending, pct, catatan:payload.catatan||'',
+    }).eq('id',id);
+    if(error) throw error;
+    return {success:true};
+  },
+  async deletePendingTransit(id) {
+    await _sb.from('pending_transit').delete().eq('id',id);
+    return {success:true};
+  },
+
+  // FILE UPLOAD (Supabase Storage)
+  async uploadFileToDriveByJenis(b64, fileName, mimeType, docId, jenis) {
+    return API._uploadFile(b64, fileName, mimeType, jenis.toLowerCase());
+  },
+  async uploadFileToDrive(b64, fileName, mimeType, caseNo) {
+    return API._uploadFile(b64, fileName, mimeType, 'issues');
+  },
+  async _uploadFile(b64, fileName, mimeType, folder='issues') {
+    try {
+      const base64 = b64.includes(',') ? b64.split(',')[1] : b64;
+      const bin = atob(base64), arr = new Uint8Array(bin.length);
+      for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+      const blob = new Blob([arr],{type:mimeType});
+      const path = `${folder}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+      const {error} = await _sb.storage.from('ccfa-attachments').upload(path, blob, {contentType:mimeType});
+      if(error) throw error;
+      const {data:{publicUrl}} = _sb.storage.from('ccfa-attachments').getPublicUrl(path);
+      return {success:true, fileUrl:publicUrl, fileName};
+    } catch(e) {
+      console.error('Upload error:', e);
+      return {success:false, message:e.message};
+    }
+  },
+};
+
+// ── google.script.run compatibility shim ───────────────────────
+// Ubah: google.script.run.withSuccessHandler(fn).withFailureHandler(fn2).method(args)
+// Menjadi: API.method(args).then(fn).catch(fn2)
+;(function() {
+  function makeChain(methodName, args) {
+    let _sh=null, _fh=null;
+    const promise = (API[methodName]||(() => Promise.reject(new Error(`API.${methodName} not found`))))(...args);
+    promise.then(r=>{if(_sh)_sh(r);}).catch(e=>{if(_fh)_fh(e);else console.error(methodName,e);});
+    const chain = {
+      withSuccessHandler(fn){_sh=fn; return chain;},
+      withFailureHandler(fn){_fh=fn; return chain;},
+    };
+    return chain;
+  }
+
+  const handler = {
+    _sh:null, _fh:null,
+    withSuccessHandler(fn){ const c=Object.create(this); c._sh=fn; return c; },
+    withFailureHandler(fn){ const c=Object.create(this); c._fh=fn; return c; },
+  };
+  const methods = ['login','logout','saveAvatar','getAllIssues','addIssue','updateIssue','deleteIssue',
+    'getAllBinIssues','restoreFromBin','permanentDeleteFromBin','emptyRecycleBin',
+    'getAllAdjust','addAdjust','updateAdjust','deleteAdjust',
+    'getHolidays','saveHolidays','deleteHoliday','fetchNationalHolidays',
+    'getAllPendingTransit','addPendingTransit','updatePendingTransit','deletePendingTransit',
+    'uploadFileToDrive','uploadFileToDriveByJenis'];
+
+  methods.forEach(m => {
+    handler[m] = function(...args) {
+      const sh=this._sh, fh=this._fh;
+      (API[m]||(() => Promise.reject(new Error(`API.${m} not found`))))(...args)
+        .then(r=>{ if(sh) sh(r); })
+        .catch(e=>{ if(fh) fh(e); else console.error(m, e); });
+    };
+  });
+
+  window.google = { script: { run: handler } };
+})();
+
+// ── Auto-restore session dari Supabase Auth ─────────────────────
+window.addEventListener('load', async () => {
+  try {
+    const { data: { session } } = await _sb.auth.getSession();
+    if (session) {
+      const { data: prof } = await _sb.from('profiles').select('*').eq('id', session.user.id).single();
+      if (prof) {
+        currentSession = {
+          token: session.access_token,
+          user: { id: prof.user_id, displayName: prof.display_name, role: prof.role, avatar: prof.avatar_base64||'' }
+        };
+        updateHolidayBtnVisibility();
+        showApp();
+        return;
+      }
+    }
+  } catch(e) { console.warn('Session restore error:', e); }
+  document.getElementById('login-page').classList.add('active');
+  document.getElementById('splash')?.classList.add('hidden');
+});
+
 // ===================== STATE =====================
 let allIssues = [];
 let binIssues = [];
@@ -2523,19 +2887,8 @@ function goToAreaPageFiltered(area, status) {
 }
 
 // ===================== LOGIN =====================
-window.onload = function() {
-  // Try restore session from sessionStorage
-  const saved = sessionStorage.getItem('ccfa_session');
-  if (saved) {
-    try {
-      currentSession = JSON.parse(saved);
-      updateHolidayBtnVisibility();
-      showApp();
-      return;
-    } catch(e) {}
-  }  // Show login
-  document.getElementById('login-page').classList.add('active');
-};
+// Session restore ditangani oleh Supabase bridge (window load event)
+// yang restore session dari Supabase Auth secara async
 
 function togglePw() {
   const inp = document.getElementById('login-pw');
@@ -2570,7 +2923,7 @@ function doLogin() {
       if (res.success) {
         currentSession = { token: res.token, user: res.user };
         updateHolidayBtnVisibility();
-        sessionStorage.setItem('ccfa_session', JSON.stringify(currentSession));
+        // session managed by Supabase
         showApp();
       } else {
         document.getElementById('login-error-msg').textContent = res.message || 'Login gagal';
@@ -2687,7 +3040,6 @@ function doLogout() {
     google.script.run.logout(currentSession.token);
   }
   currentSession = null;
-  sessionStorage.removeItem('ccfa_session');
   // Reset mood
   const badge = document.getElementById('nav-mood-badge');
   if (badge) { badge.style.display = 'none'; badge.textContent = ''; }
@@ -2832,7 +3184,7 @@ function onAvatarSelected(e) {
         hideLoader();
         if (res.success) {
           currentSession.user.avatar = dataUrl;
-          sessionStorage.setItem('ccfa_session', JSON.stringify(currentSession));
+          // session managed by Supabase
           updateUserUI();
           toast('Foto profil berhasil disimpan', 'success');
         } else {
@@ -6587,6 +6939,27 @@ function kpiRenderHistories(){
 document.addEventListener('DOMContentLoaded',()=>{
   const orig=window.sidebarNav;
   if(orig) window.sidebarNav=function(p){orig(p);if(p==='kpi')kpiRenderHistories();};
+});
+
+// ── Auto-restore session dari Supabase Auth ─────────────────
+window.addEventListener('load', async () => {
+  try {
+    const { data: { session } } = await _sb.auth.getSession();
+    if (session) {
+      const { data: prof } = await _sb.from('profiles').select('*').eq('id', session.user.id).single();
+      if (prof) {
+        currentSession = {
+          token: session.access_token,
+          user: { id: prof.user_id, displayName: prof.display_name, role: prof.role, avatar: prof.avatar_base64||'' }
+        };
+        updateHolidayBtnVisibility();
+        showApp();
+        return;
+      }
+    }
+  } catch(e) { console.warn('Session restore:', e); }
+  document.getElementById('login-page').classList.add('active');
+  document.getElementById('splash')?.classList.add('hidden');
 });
 </script>
 </body>
