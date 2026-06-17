@@ -2589,21 +2589,61 @@ function doLogin() {
 function showApp() {
   document.getElementById('login-page').classList.remove('active');
   document.getElementById('app-shell').classList.add('visible');
-  // Init breadcrumb on first load
   _prevPageId = null; _currentPageId = 'dashboard';
   renderBreadcrumb('dashboard');
-  // Load holiday data from server
-  loadHolidays();
   applyRoleUI();
   updateUserUI();
   setTodayAsDefault();
   setCasePreview();
   populateAdjYears();
-  loadAllData();
-  loadAllAdjust();
-  loadAllPT();
-  // Tampilkan mood picker sesaat setelah login
-  setTimeout(() => openMoodPicker(), 400);
+
+  // ── Parallel loading — semua data dimuat sekaligus ──────────
+  showLoader();
+  Promise.all([
+    API.getAllIssues(),
+    API.getAllBinIssues(),
+    API.getAllAdjust(),
+    API.getAllPendingTransit(),
+    API.getHolidays(),
+  ]).then(([issues, binData, adjData, ptData, holidays]) => {
+    // Issues
+    allIssues = issues;
+    populateMonthFilters();
+    renderDashboard();
+    renderIssuesPage();
+    renderAreaPage('DKE');
+    renderAreaPage('Tecno');
+
+    // Bin
+    binIssues = binData;
+    renderBinPage();
+    updateBinNavBadge();
+
+    // Adjust
+    allAdjust = adjData;
+    populateAdjFilters();
+    renderAdjustPage();
+    renderDashAdjSummary();
+
+    // Pending Transit
+    allPT = ptData;
+    populatePTFilters();
+    renderPTPage();
+    updateDashboardPT();
+    renderDashPTCharts();
+
+    // Holidays
+    appHolidays = holidays || {};
+    renderIssuesPage(); // update work days
+
+    hideLoader();
+  }).catch(err => {
+    console.error('Load error:', err);
+    toast('Gagal memuat data: ' + (err.message || err), 'error');
+    hideLoader();
+  });
+
+  setTimeout(() => openMoodPicker(), 600);
 }
 
 function applyRoleUI() {
@@ -2831,29 +2871,20 @@ function setCasePreview() {
 // ===================== LOAD DATA =====================
 function loadAllData() {
   showLoader();
-  google.script.run
-    .withSuccessHandler(issues => {
+  Promise.all([API.getAllIssues(), API.getAllBinIssues()])
+    .then(([issues, binData]) => {
       allIssues = issues;
       populateMonthFilters();
       renderDashboard();
       renderIssuesPage();
       renderAreaPage('DKE');
       renderAreaPage('Tecno');
-      google.script.run
-        .withSuccessHandler(binData => {
-          binIssues = binData;
-          renderBinPage();
-          updateBinNavBadge();
-          hideLoader();
-        })
-        .withFailureHandler(() => { hideLoader(); })
-        .getAllBinIssues();
-    })
-    .withFailureHandler(err => {
-      toast('Gagal memuat data: ' + err.message, 'error');
+      binIssues = binData;
+      renderBinPage();
+      updateBinNavBadge();
       hideLoader();
     })
-    .getAllIssues();
+    .catch(err => { toast('Gagal memuat data: '+(err.message||err),'error'); hideLoader(); });
 }
 
 // ===================== MONTH FILTER POPULATE =====================
