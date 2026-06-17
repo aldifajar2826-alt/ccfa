@@ -4982,10 +4982,19 @@ function sidebarNav(pageId) {
   const pg = document.getElementById('page-' + pageId);
   if (pg) pg.classList.add('active');
   // KPI — render histories setiap buka
-  if (pageId && pageId.startsWith('kpi-') && typeof kpiRenderHistories === 'function') {
-    kpiRenderHistories(pageId.replace('kpi-',''));
-    const pg = document.getElementById('page-' + pageId);
-    if (pg) pg.scrollTop = 0;
+  if (pageId && pageId.startsWith('kpi-')) {
+    try {
+      if (typeof kpiRenderHistories === 'function') kpiRenderHistories(pageId.replace('kpi-',''));
+    } catch(e) { console.warn('KPI render error:', e); }
+    setTimeout(() => {
+      const pg2 = document.getElementById('page-' + pageId);
+      if (pg2) pg2.scrollTop = 0;
+    }, 50);
+    // Auto-expand KPI group di sidebar
+    const kpiHdr = document.getElementById('sbar-kpi-hdr');
+    const kpiSub = document.getElementById('sbar-kpi-sub');
+    if (kpiHdr) kpiHdr.classList.add('open');
+    if (kpiSub) kpiSub.classList.add('open');
   }
 
   // Update breadcrumb (sidebar navigation = not from dashboard)
@@ -6953,7 +6962,16 @@ async function downloadDashboardPPT(themeKey) {
 </script>
 
 <script>
-let kpiData=JSON.parse(localStorage.getItem('kpi_data')||'{"dmcr":[],"iwr":[],"pr":[],"cv":[]}');
+let kpiData;
+try {
+  kpiData = JSON.parse(localStorage.getItem('kpi_data') || '{}');
+  if (!kpiData.dmcr) kpiData.dmcr = [];
+  if (!kpiData.iwr)  kpiData.iwr  = [];
+  if (!kpiData.pr)   kpiData.pr   = [];
+  if (!kpiData.cv)   kpiData.cv   = [];
+} catch(e) {
+  kpiData = { dmcr:[], iwr:[], pr:[], cv:[] };
+}
 function _kpiFmt(n){return Number(n).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})+'%';}
 function _kpiRp(n){return 'Rp '+Number(n).toLocaleString('id-ID');}
 function _kpiBadge(el,t,c){el.textContent=t;el.className='kpi-result-badge kpi-badge-'+c;}
@@ -7015,22 +7033,7 @@ function kpiSaveAll(){
 function kpiClearAll(){
   ['dmcr','iwr','pr','cv'].forEach(k=>kpiClear(k));
 }
-function kpiSaveAll(){
-  const now=new Date().toLocaleDateString('id-ID');
-  const g=id=>+document.getElementById(id).value||0,s=id=>document.getElementById(id).value||now;
-  const sc=(v,a,b)=>v<=a?'good':v<=b?'warn':'bad';
-  const bb=g('kpi-dmcr-bb'),rev=g('kpi-dmcr-rev');
-  if(bb&&rev){const r=(bb/rev*100).toFixed(2);kpiData.dmcr.unshift({period:s('kpi-dmcr-period'),bb,rev,ratio:r,status:r<=40?'Efisien':r<=60?'Perhatian':'Tinggi'});if(kpiData.dmcr.length>12)kpiData.dmcr.pop();}
-  const wo=g('kpi-iwr-writeoff'),avg=g('kpi-iwr-avginv');
-  if(wo&&avg){const r=(wo/avg*100).toFixed(2);kpiData.iwr.unshift({period:s('kpi-iwr-period'),wo,avg,ratio:r,ket:document.getElementById('kpi-iwr-ket').value,status:r<=1?'Baik':r<=3?'Perhatian':'Tinggi'});if(kpiData.iwr.length>12)kpiData.iwr.pop();}
-  const act=g('kpi-pr-actual'),lst=g('kpi-pr-list');
-  if(act&&lst){const r=(act/lst*100).toFixed(2);kpiData.pr.unshift({period:s('kpi-pr-period'),actual:act,list:lst,ratio:r,status:r>=95?'Optimal':r>=85?'Perhatian':'Rendah'});if(kpiData.pr.length>12)kpiData.pr.pop();}
-  const ca=g('kpi-cv-actual'),cs=g('kpi-cv-standard');
-  if(ca&&cs){const r=((ca-cs)/cs*100).toFixed(2);kpiData.cv.unshift({period:s('kpi-cv-period'),actual:ca,std:cs,variance:r,price:g('kpi-cv-price'),usage:g('kpi-cv-usage'),mix:g('kpi-cv-mix'),status:r<=0?'Favorable':r<=5?'Perhatian':'Unfavorable'});if(kpiData.cv.length>12)kpiData.cv.pop();}
-  localStorage.setItem('kpi_data',JSON.stringify(kpiData));
-  kpiRenderHistories();
-  toast('KPI berhasil disimpan','success');
-}
+
 function kpiClearAll(){
   ['kpi-dmcr-bb','kpi-dmcr-rev','kpi-dmcr-period','kpi-iwr-writeoff','kpi-iwr-avginv','kpi-iwr-period','kpi-iwr-ket','kpi-pr-actual','kpi-pr-list','kpi-pr-period','kpi-cv-actual','kpi-cv-standard','kpi-cv-period','kpi-cv-price','kpi-cv-usage','kpi-cv-mix']
     .forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
