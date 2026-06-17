@@ -939,6 +939,9 @@ html { -webkit-text-size-adjust: 100%; }
 /* ── KPI PAGE ── */
 #page-kpi-dmcr, #page-kpi-iwr, #page-kpi-pr, #page-kpi-cv {
   padding: 16px 20px !important;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;margin-top:16px;}
 .kpi-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
