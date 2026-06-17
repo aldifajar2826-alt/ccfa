@@ -4817,6 +4817,8 @@ function sidebarNav(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const pg = document.getElementById('page-' + pageId);
   if (pg) pg.classList.add('active');
+  // KPI — render histories setiap buka
+  if (pageId === 'kpi' && typeof kpiRenderHistories === 'function') kpiRenderHistories();
 
   // Update breadcrumb (sidebar navigation = not from dashboard)
   renderBreadcrumb(pageId, false);
@@ -6935,11 +6937,7 @@ function kpiRenderHistories(){
   if(tb('kpi-pr-history'))tb('kpi-pr-history').innerHTML=kpiData.pr.length?kpiData.pr.map(r=>`<tr><td>${r.period}</td><td>${fmt(r.actual)}</td><td>${fmt(r.list)}</td><td><b>${r.ratio}%</b></td><td style="color:${sc(r.status)}">${r.status}</td></tr>`).join(''):empty(5);
   if(tb('kpi-cv-history'))tb('kpi-cv-history').innerHTML=kpiData.cv.length?kpiData.cv.map(r=>`<tr><td>${r.period}</td><td>${fmt(r.actual)}</td><td>${fmt(r.std)}</td><td><b style="color:${sc(r.status)}">${r.variance>=0?'+':''}${r.variance}%</b></td><td>${r.price?fmt(r.price):'—'}</td><td>${r.usage?fmt(r.usage):'—'}</td><td>${r.mix?fmt(r.mix):'—'}</td></tr>`).join(''):empty(7);
 }
-// Hook sidebarNav
-document.addEventListener('DOMContentLoaded',()=>{
-  const orig=window.sidebarNav;
-  if(orig) window.sidebarNav=function(p){orig(p);if(p==='kpi')kpiRenderHistories();};
-});
+// kpiRenderHistories dipanggil langsung dari sidebarNav patch di bawah
 
 // ── Auto-restore session dari Supabase Auth ─────────────────
 window.addEventListener('load', async () => {
