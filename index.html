@@ -937,6 +937,9 @@ html { -webkit-text-size-adjust: 100%; }
 
 
 /* ── KPI PAGE ── */
+#page-kpi-dmcr, #page-kpi-iwr, #page-kpi-pr, #page-kpi-cv {
+  padding: 0 !important;
+}
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;margin-top:16px;}
 .kpi-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
 .kpi-card-head{padding:16px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
@@ -4790,10 +4793,10 @@ const PAGE_LABELS = {
   'adjust':        'Adjust',
   'pending-transit':'Pending Transit',
   'recycle-bin':   'Recycle Bin',
-  'kpi-dmcr':      'Direct Material Cost Ratio',
-  'kpi-iwr':       'Inventory Write-Off Ratio',
-  'kpi-pr':        'Pricing Realization',
-  'kpi-cv':        'COGS Variance vs Standard',
+  'kpi-dmcr':      'KPI — Direct Material Cost Ratio',
+  'kpi-iwr':       'KPI — Inventory Write-Off Ratio',
+  'kpi-pr':        'KPI — Pricing Realization',
+  'kpi-cv':        'KPI — COGS Variance vs Standard',
 };
 
 function openSidebar() {
