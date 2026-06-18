@@ -93,7 +93,7 @@ body {
 
 /* PAGES */
 .pages { flex: 1; overflow: hidden; position: relative; }
-.page { display: none; position: absolute; inset: 0; overflow-y: auto; padding: 20px; }
+.page { display: none; height: 100%; overflow-y: auto; padding: 20px; }
 .page.active { display: block; }
 
 /* FILTER ROW */
@@ -548,7 +548,7 @@ textarea.form-ctrl { resize: vertical; min-height: 72px; max-height: 140px; }
   overflow: hidden; max-height: 0;
   transition: max-height .25s ease;
 }
-.sidebar-sub.open { max-height: 200px; }
+.sidebar-sub.open { max-height: 400px; }
 .sidebar-sub-item {
   display: flex; align-items: center; gap: 9px;
   padding: 9px 12px 9px 38px; border-radius: 9px;
@@ -936,38 +936,6 @@ html { -webkit-text-size-adjust: 100%; }
 * { -webkit-tap-highlight-color: rgba(37,99,235,.1); }
 
 
-
-/* ── KPI PAGE ── */
-#page-kpi-dmcr, #page-kpi-iwr, #page-kpi-pr, #page-kpi-cv {
-  padding: 16px 20px !important;
-}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;margin-top:16px;}
-.kpi-card{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);}
-.kpi-card-head{padding:16px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
-.kpi-card-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-.kpi-card-title{font-size:13px;font-weight:700;color:var(--text);}
-.kpi-card-formula{font-size:11px;color:var(--text2);margin-top:2px;font-style:italic;}
-.kpi-card-body{padding:18px 20px;}
-.kpi-input-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px;}
-.kpi-input-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:120px;}
-.kpi-input-group label{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;}
-.kpi-input-group input,.kpi-input-group select{height:38px;border:1px solid var(--border);border-radius:9px;padding:0 11px;font-size:13px;color:var(--text);background:#f8fafc;font-family:inherit;outline:none;transition:border .15s;}
-.kpi-input-group input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-lt);}
-.kpi-result{background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px;}
-.kpi-result-label{font-size:12px;color:var(--gray);}
-.kpi-result-value{font-size:28px;font-weight:700;font-family:monospace;}
-.kpi-result-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
-.kpi-badge-good{background:var(--green-lt);color:var(--green);}
-.kpi-badge-warn{background:var(--amber-lt);color:var(--amber);}
-.kpi-badge-bad{background:var(--red-lt);color:var(--red);}
-.kpi-history{margin-top:16px;}
-.kpi-history-title{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
-.kpi-history-table{width:100%;border-collapse:collapse;font-size:12px;}
-.kpi-history-table th{background:#f8fafc;padding:6px 10px;text-align:left;color:var(--gray);font-weight:600;border-bottom:1px solid var(--border);}
-.kpi-history-table td{padding:6px 10px;border-bottom:1px solid var(--border);color:var(--text);}
-.kpi-history-table tr:last-child td{border-bottom:none;}
-.kpi-sub-label{font-size:11px;color:var(--gray);margin:10px 0 6px;font-weight:600;}
-.kpi-sub-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
 </style>
 </head>
 <body>
@@ -1075,27 +1043,23 @@ html { -webkit-text-size-adjust: 100%; }
 
     <p class="sidebar-section-label">KPI</p>
     <div class="sidebar-group">
-      <button class="sidebar-group-header open" id="sbar-kpi-hdr" onclick="toggleKpiGroup()">
+      <button class="sidebar-group-header open" id="sbar-kpi-hdr" onclick="toggleKPIGroup()">
         <i class="ti ti-chart-bar group-icon"></i>
         <span style="flex:1;text-align:left;">KPI</span>
         <i class="ti ti-chevron-down chevron"></i>
       </button>
       <div class="sidebar-sub open" id="sbar-kpi-sub">
-        <button class="sidebar-sub-item" id="sbar-kpi-dmcr" onclick="sidebarNav('kpi-dmcr')">
-          <i class="ti ti-coin"></i>
-          <span>Direct Material Cost</span>
+        <button class="sidebar-sub-item" id="sbar-kpi-dm" onclick="sidebarNav('kpi-dm')">
+          <i class="ti ti-package"></i><span>Direct Material Cost</span>
         </button>
-        <button class="sidebar-sub-item" id="sbar-kpi-iwr" onclick="sidebarNav('kpi-iwr')">
-          <i class="ti ti-package-off"></i>
-          <span>Inventory Write-Off</span>
+        <button class="sidebar-sub-item" id="sbar-kpi-iw" onclick="sidebarNav('kpi-iw')">
+          <i class="ti ti-trash-off"></i><span>Inventory Write-Off</span>
         </button>
         <button class="sidebar-sub-item" id="sbar-kpi-pr" onclick="sidebarNav('kpi-pr')">
-          <i class="ti ti-tag"></i>
-          <span>Pricing Realization</span>
+          <i class="ti ti-tag"></i><span>Pricing Realization</span>
         </button>
         <button class="sidebar-sub-item" id="sbar-kpi-cv" onclick="sidebarNav('kpi-cv')">
-          <i class="ti ti-chart-arrows-vertical"></i>
-          <span>COGS Variance</span>
+          <i class="ti ti-chart-arrows-vertical"></i><span>COGS Variance</span>
         </button>
       </div>
     </div>
@@ -1929,135 +1893,291 @@ html { -webkit-text-size-adjust: 100%; }
         <div class="pagination-bar" id="adj-pg-bar"></div>
       </div>
     
-<!-- PAGE KPI: DMCR -->
-<div class="page" id="page-kpi-dmcr">
-  <div>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <div style="width:42px;height:42px;background:linear-gradient(135deg,#0ea5e9,#6366f1);border-radius:12px;display:flex;align-items:center;justify-content:center;"><i class="ti ti-coin" style="color:#fff;font-size:20px"></i></div>
-      <div><div style="font-size:18px;font-weight:700;color:var(--text)">Direct Material Cost Ratio</div><div style="font-size:12px;color:var(--text2)">Bahan Baku / Revenue × 100% (At Standard Cost)</div></div>
-      <div style="margin-left:auto;display:flex;gap:8px;">
-        <button onclick="kpiClear('dmcr')" style="padding:7px 14px;background:var(--bg);border:1px solid var(--border);border-radius:9px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;"><i class="ti ti-trash" style="font-size:12px"></i> Reset</button>
-        <button onclick="kpiSave('dmcr')" style="padding:7px 14px;background:#3b82f6;border:none;border-radius:9px;font-size:12px;color:#fff;cursor:pointer;font-family:inherit;font-weight:600;"><i class="ti ti-device-floppy" style="font-size:12px"></i> Simpan</button>
-      </div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-card-body">
-        <div class="kpi-input-row">
-          <div class="kpi-input-group"><label>Bahan Baku (Rp)</label><input type="number" id="kpi-dmcr-bb" placeholder="0" oninput="calcDMCR()" min="0"></div>
-          <div class="kpi-input-group"><label>Revenue (Rp)</label><input type="number" id="kpi-dmcr-rev" placeholder="0" oninput="calcDMCR()" min="0"></div>
-          <div class="kpi-input-group" style="max-width:160px"><label>Periode</label><input type="month" id="kpi-dmcr-period"></div>
+    <!-- ============ KPI: DIRECT MATERIAL COST RATIO ============ -->
+    <div class="page" id="page-kpi-dm">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:38px;height:38px;background:linear-gradient(135deg,#0891b2,#0e7490);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <i class="ti ti-package" style="color:#fff;font-size:20px"></i>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:var(--text);">Direct Material Cost Ratio</div>
+            <div style="font-size:12px;color:var(--text2);">Bahan Baku / Revenue × 100% — At Standard Cost</div>
+          </div>
         </div>
-        <div class="kpi-result">
-          <div><div class="kpi-result-label">Hasil — Direct Material Cost Ratio</div><div class="kpi-result-value" id="kpi-dmcr-val" style="color:var(--text2)">—</div><div style="font-size:11px;color:var(--text2);margin-top:4px">≤ 40% Efisien &nbsp;·&nbsp; 40–60% Perhatian &nbsp;·&nbsp; &gt; 60% Tinggi</div></div>
-          <span class="kpi-result-badge" id="kpi-dmcr-badge"></span>
-        </div>
-        <div class="kpi-history" style="margin-top:20px"><div class="kpi-history-title">Riwayat</div>
-          <table class="kpi-history-table"><thead><tr><th>Periode</th><th>Bahan Baku</th><th>Revenue</th><th>Ratio</th><th>Status</th></tr></thead><tbody id="kpi-dmcr-history"></tbody></table>
+        <div style="margin-left:auto;">
+          <button class="btn-new" style="background:linear-gradient(135deg,#0891b2,#0e7490);" onclick="openKpiModal('dm')">
+            <i class="ti ti-plus"></i><span class="btn-text"> Input Data</span>
+          </button>
         </div>
       </div>
-    </div>
-  </div>
-</div>
 
-<!-- PAGE KPI: IWR -->
-<div class="page" id="page-kpi-iwr">
-  <div>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <div style="width:42px;height:42px;background:linear-gradient(135deg,#ef4444,#f97316);border-radius:12px;display:flex;align-items:center;justify-content:center;"><i class="ti ti-package-off" style="color:#fff;font-size:20px"></i></div>
-      <div><div style="font-size:18px;font-weight:700;color:var(--text)">Inventory Write-Off Ratio</div><div style="font-size:12px;color:var(--text2)">Nilai Write-Off / Avg Inventory × 100%</div></div>
-      <div style="margin-left:auto;display:flex;gap:8px;">
-        <button onclick="kpiClear('iwr')" style="padding:7px 14px;background:var(--bg);border:1px solid var(--border);border-radius:9px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;"><i class="ti ti-trash" style="font-size:12px"></i> Reset</button>
-        <button onclick="kpiSave('iwr')" style="padding:7px 14px;background:#3b82f6;border:none;border-radius:9px;font-size:12px;color:#fff;cursor:pointer;font-family:inherit;font-weight:600;"><i class="ti ti-device-floppy" style="font-size:12px"></i> Simpan</button>
+      <!-- Formula Card -->
+      <div style="background:linear-gradient(135deg,#ecfeff,#e0f2fe);border:1px solid #a5f3fc;border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div style="font-size:13px;font-weight:700;color:#0891b2;display:flex;align-items:center;gap:8px;">
+          <i class="ti ti-formula" style="font-size:18px"></i> Rumus:
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:600;color:#0e7490;background:white;padding:8px 16px;border-radius:8px;border:1px solid #a5f3fc;">
+          DM Cost Ratio = Bahan Baku / Revenue × 100%
+        </div>
+        <div style="font-size:11px;color:#0891b2;font-style:italic;">Menggunakan At Standard Cost</div>
       </div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-card-body">
-        <div class="kpi-input-row">
-          <div class="kpi-input-group"><label>Nilai Write-Off (Rp)</label><input type="number" id="kpi-iwr-writeoff" placeholder="0" oninput="calcIWR()" min="0"></div>
-          <div class="kpi-input-group"><label>Avg Inventory (Rp)</label><input type="number" id="kpi-iwr-avginv" placeholder="0" oninput="calcIWR()" min="0"></div>
-          <div class="kpi-input-group" style="max-width:160px"><label>Periode</label><input type="month" id="kpi-iwr-period"></div>
-        </div>
-        <div class="kpi-input-row" style="margin-bottom:0"><div class="kpi-input-group"><label>Keterangan</label><input type="text" id="kpi-iwr-ket" placeholder="slow-moving, expired, dll"></div></div>
-        <div class="kpi-result" style="margin-top:14px">
-          <div><div class="kpi-result-label">Hasil — Inventory Write-Off Ratio</div><div class="kpi-result-value" id="kpi-iwr-val" style="color:var(--text2)">—</div><div style="font-size:11px;color:var(--text2);margin-top:4px">≤ 1% Baik &nbsp;·&nbsp; 1–3% Perhatian &nbsp;·&nbsp; &gt; 3% Tinggi</div></div>
-          <span class="kpi-result-badge" id="kpi-iwr-badge"></span>
-        </div>
-        <div class="kpi-history" style="margin-top:20px"><div class="kpi-history-title">Riwayat</div>
-          <table class="kpi-history-table"><thead><tr><th>Periode</th><th>Write-Off</th><th>Avg Inv</th><th>Ratio</th><th>Status</th></tr></thead><tbody id="kpi-iwr-history"></tbody></table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- PAGE KPI: PR -->
-<div class="page" id="page-kpi-pr">
-  <div>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <div style="width:42px;height:42px;background:linear-gradient(135deg,#10b981,#06b6d4);border-radius:12px;display:flex;align-items:center;justify-content:center;"><i class="ti ti-tag" style="color:#fff;font-size:20px"></i></div>
-      <div><div style="font-size:18px;font-weight:700;color:var(--text)">Pricing Realization</div><div style="font-size:12px;color:var(--text2)">Avg Selling Price Actual / List Price × 100%</div></div>
-      <div style="margin-left:auto;display:flex;gap:8px;">
-        <button onclick="kpiClear('pr')" style="padding:7px 14px;background:var(--bg);border:1px solid var(--border);border-radius:9px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;"><i class="ti ti-trash" style="font-size:12px"></i> Reset</button>
-        <button onclick="kpiSave('pr')" style="padding:7px 14px;background:#3b82f6;border:none;border-radius:9px;font-size:12px;color:#fff;cursor:pointer;font-family:inherit;font-weight:600;"><i class="ti ti-device-floppy" style="font-size:12px"></i> Simpan</button>
-      </div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-card-body">
-        <div class="kpi-input-row">
-          <div class="kpi-input-group"><label>Avg Selling Price Actual (Rp)</label><input type="number" id="kpi-pr-actual" placeholder="0" oninput="calcPR()" min="0"></div>
-          <div class="kpi-input-group"><label>List Price (Rp)</label><input type="number" id="kpi-pr-list" placeholder="0" oninput="calcPR()" min="0"></div>
-          <div class="kpi-input-group" style="max-width:160px"><label>Periode</label><input type="month" id="kpi-pr-period"></div>
+      <!-- Stat Cards -->
+      <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+        <div class="stat-card" style="--accent:#0891b2">
+          <div class="stat-icon" style="--icon-bg:#ecfeff;--icon-color:#0891b2"><i class="ti ti-trending-up"></i></div>
+          <div class="stat-val" id="kpi-dm-latest">—</div>
+          <div class="stat-lbl">Rasio Terkini (%)</div>
         </div>
-        <div class="kpi-result">
-          <div><div class="kpi-result-label">Hasil — Pricing Realization</div><div class="kpi-result-value" id="kpi-pr-val" style="color:var(--text2)">—</div><div style="font-size:11px;color:var(--text2);margin-top:4px">≥ 95% Optimal &nbsp;·&nbsp; 85–95% Perhatian &nbsp;·&nbsp; &lt; 85% Rendah</div></div>
-          <span class="kpi-result-badge" id="kpi-pr-badge"></span>
+        <div class="stat-card" style="--accent:#0891b2">
+          <div class="stat-icon" style="--icon-bg:#ecfeff;--icon-color:#0891b2"><i class="ti ti-chart-line"></i></div>
+          <div class="stat-val" id="kpi-dm-avg">—</div>
+          <div class="stat-lbl">Rata-rata (%)</div>
         </div>
-        <div class="kpi-history" style="margin-top:20px"><div class="kpi-history-title">Riwayat</div>
-          <table class="kpi-history-table"><thead><tr><th>Periode</th><th>Actual Price</th><th>List Price</th><th>Realisasi</th><th>Status</th></tr></thead><tbody id="kpi-pr-history"></tbody></table>
+        <div class="stat-card" style="--accent:#0891b2">
+          <div class="stat-icon" style="--icon-bg:#ecfeff;--icon-color:#0891b2"><i class="ti ti-list-numbers"></i></div>
+          <div class="stat-val" id="kpi-dm-count">—</div>
+          <div class="stat-lbl">Total Entry</div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
 
-<!-- PAGE KPI: COGS VARIANCE -->
-<div class="page" id="page-kpi-cv">
-  <div>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <div style="width:42px;height:42px;background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:12px;display:flex;align-items:center;justify-content:center;"><i class="ti ti-chart-arrows-vertical" style="color:#fff;font-size:20px"></i></div>
-      <div><div style="font-size:18px;font-weight:700;color:var(--text)">COGS Variance vs Standard</div><div style="font-size:12px;color:var(--text2)">(Actual COGS − Standard COGS) / Standard COGS × 100%</div></div>
-      <div style="margin-left:auto;display:flex;gap:8px;">
-        <button onclick="kpiClear('cv')" style="padding:7px 14px;background:var(--bg);border:1px solid var(--border);border-radius:9px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;"><i class="ti ti-trash" style="font-size:12px"></i> Reset</button>
-        <button onclick="kpiSave('cv')" style="padding:7px 14px;background:#3b82f6;border:none;border-radius:9px;font-size:12px;color:#fff;cursor:pointer;font-family:inherit;font-weight:600;"><i class="ti ti-device-floppy" style="font-size:12px"></i> Simpan</button>
-      </div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-card-body">
-        <div class="kpi-input-row">
-          <div class="kpi-input-group"><label>Actual COGS (Rp)</label><input type="number" id="kpi-cv-actual" placeholder="0" oninput="calcCV()" min="0"></div>
-          <div class="kpi-input-group"><label>Standard COGS (Rp)</label><input type="number" id="kpi-cv-standard" placeholder="0" oninput="calcCV()" min="0"></div>
-          <div class="kpi-input-group" style="max-width:160px"><label>Periode</label><input type="month" id="kpi-cv-period"></div>
+      <!-- Table -->
+      <div class="table-card">
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <div class="section-title">
+            <i class="ti ti-package" style="color:#0891b2"></i>
+            <span style="color:#0891b2">Data Direct Material Cost Ratio</span>
+            <span class="count-badge" style="background:#ecfeff;color:#0891b2;" id="kpi-dm-tbl-count">0</span>
+          </div>
         </div>
-        <div class="kpi-sub-label">Pisah Variance (opsional)</div>
-        <div class="kpi-sub-row">
-          <div class="kpi-input-group"><label>Price Variance (Rp)</label><input type="number" id="kpi-cv-price" placeholder="0" oninput="calcCV()"></div>
-          <div class="kpi-input-group"><label>Usage Variance (Rp)</label><input type="number" id="kpi-cv-usage" placeholder="0" oninput="calcCV()"></div>
-          <div class="kpi-input-group"><label>Mix Variance (Rp)</label><input type="number" id="kpi-cv-mix" placeholder="0" oninput="calcCV()"></div>
-        </div>
-        <div class="kpi-result">
-          <div style="flex:1"><div class="kpi-result-label">Total Variance</div><div class="kpi-result-value" id="kpi-cv-val" style="color:var(--text2)">—</div><div id="kpi-cv-breakdown" style="margin-top:8px;font-size:11px;color:var(--text2);display:flex;gap:14px;flex-wrap:wrap;"></div><div style="font-size:11px;color:var(--text2);margin-top:4px">≤ 0% Favorable &nbsp;·&nbsp; 0–5% Perhatian &nbsp;·&nbsp; &gt; 5% Unfavorable</div></div>
-          <span class="kpi-result-badge" id="kpi-cv-badge"></span>
-        </div>
-        <div class="kpi-history" style="margin-top:20px"><div class="kpi-history-title">Riwayat</div>
-          <table class="kpi-history-table"><thead><tr><th>Periode</th><th>Actual</th><th>Standard</th><th>Variance</th><th>Price</th><th>Usage</th><th>Mix</th></tr></thead><tbody id="kpi-cv-history"></tbody></table>
+        <div class="tbl-wrap">
+          <table class="main-tbl">
+            <thead><tr>
+              <th>No.</th><th>Bulan</th><th>Tahun</th>
+              <th>Bahan Baku (Rp)</th><th>Revenue (Rp)</th>
+              <th>Rasio (%)</th><th>Catatan</th><th>Tgl Input</th><th>Aksi</th>
+            </tr></thead>
+            <tbody id="kpi-dm-tbody"></tbody>
+          </table>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
+    <!-- ============ KPI: INVENTORY WRITE-OFF RATIO ============ -->
+    <div class="page" id="page-kpi-iw">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:38px;height:38px;background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <i class="ti ti-trash-off" style="color:#fff;font-size:20px"></i>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:var(--text);">Inventory Write-Off Ratio</div>
+            <div style="font-size:12px;color:var(--text2);">Nilai Write-off (Slow-Moving, Expired) / Avg Inventory × 100%</div>
+          </div>
+        </div>
+        <div style="margin-left:auto;">
+          <button class="btn-new" style="background:linear-gradient(135deg,#dc2626,#b91c1c);" onclick="openKpiModal('iw')">
+            <i class="ti ti-plus"></i><span class="btn-text"> Input Data</span>
+          </button>
+        </div>
+      </div>
 
-</div>
+      <!-- Formula Card -->
+      <div style="background:linear-gradient(135deg,#fef2f2,#fee2e2);border:1px solid #fecaca;border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div style="font-size:13px;font-weight:700;color:#dc2626;display:flex;align-items:center;gap:8px;">
+          <i class="ti ti-formula" style="font-size:18px"></i> Rumus:
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:600;color:#b91c1c;background:white;padding:8px 16px;border-radius:8px;border:1px solid #fecaca;">
+          Write-Off Ratio = Nilai Write-off / Avg Inventory × 100%
+        </div>
+        <div style="font-size:11px;color:#dc2626;font-style:italic;">Termasuk: slow-moving &amp; expired</div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+        <div class="stat-card" style="--accent:#dc2626">
+          <div class="stat-icon" style="--icon-bg:#fef2f2;--icon-color:#dc2626"><i class="ti ti-trending-down"></i></div>
+          <div class="stat-val" id="kpi-iw-latest">—</div>
+          <div class="stat-lbl">Rasio Terkini (%)</div>
+        </div>
+        <div class="stat-card" style="--accent:#dc2626">
+          <div class="stat-icon" style="--icon-bg:#fef2f2;--icon-color:#dc2626"><i class="ti ti-chart-line"></i></div>
+          <div class="stat-val" id="kpi-iw-avg">—</div>
+          <div class="stat-lbl">Rata-rata (%)</div>
+        </div>
+        <div class="stat-card" style="--accent:#dc2626">
+          <div class="stat-icon" style="--icon-bg:#fef2f2;--icon-color:#dc2626"><i class="ti ti-list-numbers"></i></div>
+          <div class="stat-val" id="kpi-iw-count">—</div>
+          <div class="stat-lbl">Total Entry</div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-card">
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <div class="section-title">
+            <i class="ti ti-trash-off" style="color:#dc2626"></i>
+            <span style="color:#dc2626">Data Inventory Write-Off Ratio</span>
+            <span class="count-badge" style="background:#fef2f2;color:#dc2626;" id="kpi-iw-tbl-count">0</span>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="main-tbl">
+            <thead><tr>
+              <th>No.</th><th>Bulan</th><th>Tahun</th>
+              <th>Nilai Write-off (Rp)</th><th>Avg Inventory (Rp)</th>
+              <th>Rasio (%)</th><th>Catatan</th><th>Tgl Input</th><th>Aksi</th>
+            </tr></thead>
+            <tbody id="kpi-iw-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ KPI: PRICING REALIZATION ============ -->
+    <div class="page" id="page-kpi-pr">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:38px;height:38px;background:linear-gradient(135deg,#16a34a,#15803d);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <i class="ti ti-tag" style="color:#fff;font-size:20px"></i>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:var(--text);">Pricing Realization</div>
+            <div style="font-size:12px;color:var(--text2);">Avg Selling Price Actual / List Price × 100%</div>
+          </div>
+        </div>
+        <div style="margin-left:auto;">
+          <button class="btn-new" style="background:linear-gradient(135deg,#16a34a,#15803d);" onclick="openKpiModal('pr')">
+            <i class="ti ti-plus"></i><span class="btn-text"> Input Data</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Formula Card -->
+      <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #bbf7d0;border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div style="font-size:13px;font-weight:700;color:#16a34a;display:flex;align-items:center;gap:8px;">
+          <i class="ti ti-formula" style="font-size:18px"></i> Rumus:
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:600;color:#15803d;background:white;padding:8px 16px;border-radius:8px;border:1px solid #bbf7d0;">
+          Pricing Realization = Avg Selling Price Actual / List Price × 100%
+        </div>
+        <div style="font-size:11px;color:#16a34a;font-style:italic;">Semakin mendekati 100% → semakin baik</div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+        <div class="stat-card" style="--accent:#16a34a">
+          <div class="stat-icon" style="--icon-bg:#f0fdf4;--icon-color:#16a34a"><i class="ti ti-trending-up"></i></div>
+          <div class="stat-val" id="kpi-pr-latest">—</div>
+          <div class="stat-lbl">Rasio Terkini (%)</div>
+        </div>
+        <div class="stat-card" style="--accent:#16a34a">
+          <div class="stat-icon" style="--icon-bg:#f0fdf4;--icon-color:#16a34a"><i class="ti ti-chart-line"></i></div>
+          <div class="stat-val" id="kpi-pr-avg">—</div>
+          <div class="stat-lbl">Rata-rata (%)</div>
+        </div>
+        <div class="stat-card" style="--accent:#16a34a">
+          <div class="stat-icon" style="--icon-bg:#f0fdf4;--icon-color:#16a34a"><i class="ti ti-list-numbers"></i></div>
+          <div class="stat-val" id="kpi-pr-count">—</div>
+          <div class="stat-lbl">Total Entry</div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-card">
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <div class="section-title">
+            <i class="ti ti-tag" style="color:#16a34a"></i>
+            <span style="color:#16a34a">Data Pricing Realization</span>
+            <span class="count-badge" style="background:#f0fdf4;color:#16a34a;" id="kpi-pr-tbl-count">0</span>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="main-tbl">
+            <thead><tr>
+              <th>No.</th><th>Bulan</th><th>Tahun</th>
+              <th>Avg Selling Price Actual (Rp)</th><th>List Price (Rp)</th>
+              <th>Rasio (%)</th><th>Catatan</th><th>Tgl Input</th><th>Aksi</th>
+            </tr></thead>
+            <tbody id="kpi-pr-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ KPI: COGS VARIANCE VS STANDARD ============ -->
+    <div class="page" id="page-kpi-cv">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:38px;height:38px;background:linear-gradient(135deg,#7c3aed,#6d28d9);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <i class="ti ti-calculator" style="color:#fff;font-size:20px"></i>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:var(--text);">COGS Variance vs Standard</div>
+            <div style="font-size:12px;color:var(--text2);">(Actual COGS − Standard COGS) / Standard COGS × 100%</div>
+          </div>
+        </div>
+        <div style="margin-left:auto;">
+          <button class="btn-new" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);" onclick="openKpiModal('cv')">
+            <i class="ti ti-plus"></i><span class="btn-text"> Input Data</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Formula Card -->
+      <div style="background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1px solid #ddd6fe;border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div style="font-size:13px;font-weight:700;color:#7c3aed;display:flex;align-items:center;gap:8px;">
+          <i class="ti ti-formula" style="font-size:18px"></i> Rumus:
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:600;color:#6d28d9;background:white;padding:8px 16px;border-radius:8px;border:1px solid #ddd6fe;">
+          COGS Variance = (Actual COGS − Standard COGS) / Standard COGS × 100%
+        </div>
+        <div style="font-size:11px;color:#7c3aed;font-style:italic;">Variance positif = Actual lebih mahal dari Standard</div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+        <div class="stat-card" style="--accent:#7c3aed">
+          <div class="stat-icon" style="--icon-bg:#f5f3ff;--icon-color:#7c3aed"><i class="ti ti-trending-up"></i></div>
+          <div class="stat-val" id="kpi-cv-latest">—</div>
+          <div class="stat-lbl">Variance Terkini (%)</div>
+        </div>
+        <div class="stat-card" style="--accent:#7c3aed">
+          <div class="stat-icon" style="--icon-bg:#f5f3ff;--icon-color:#7c3aed"><i class="ti ti-chart-line"></i></div>
+          <div class="stat-val" id="kpi-cv-avg">—</div>
+          <div class="stat-lbl">Rata-rata (%)</div>
+        </div>
+        <div class="stat-card" style="--accent:#7c3aed">
+          <div class="stat-icon" style="--icon-bg:#f5f3ff;--icon-color:#7c3aed"><i class="ti ti-list-numbers"></i></div>
+          <div class="stat-val" id="kpi-cv-count">—</div>
+          <div class="stat-lbl">Total Entry</div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-card">
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <div class="section-title">
+            <i class="ti ti-calculator" style="color:#7c3aed"></i>
+            <span style="color:#7c3aed">Data COGS Variance vs Standard</span>
+            <span class="count-badge" style="background:#f5f3ff;color:#7c3aed;" id="kpi-cv-tbl-count">0</span>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="main-tbl">
+            <thead><tr>
+              <th>No.</th><th>Bulan</th><th>Tahun</th>
+              <th>Actual COGS (Rp)</th><th>Standard COGS (Rp)</th>
+              <th>Variance (%)</th><th>Pisah Variance</th>
+              <th>Price Variance (%)</th><th>Usage Variance (%)</th><th>Mix Variance (%)</th>
+              <th>Catatan</th><th>Tgl Input</th><th>Aksi</th>
+            </tr></thead>
+            <tbody id="kpi-cv-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
   </div><!-- end pages -->
 </div><!-- end app-shell -->
@@ -4923,10 +5043,10 @@ const PAGE_LABELS = {
   'adjust':        'Adjust',
   'pending-transit':'Pending Transit',
   'recycle-bin':   'Recycle Bin',
-  'kpi-dmcr':      'KPI — Direct Material Cost Ratio',
-  'kpi-iwr':       'KPI — Inventory Write-Off Ratio',
-  'kpi-pr':        'KPI — Pricing Realization',
-  'kpi-cv':        'KPI — COGS Variance vs Standard',
+  'kpi-dm':  'KPI — Direct Material Cost Ratio',
+  'kpi-iw':  'KPI — Inventory Write-Off Ratio',
+  'kpi-pr':  'KPI — Pricing Realization',
+  'kpi-cv':  'KPI — COGS Variance vs Standard',
 };
 
 function openSidebar() {
@@ -4984,18 +5104,12 @@ function sidebarNav(pageId) {
   if (pg) pg.classList.add('active');
   // KPI — render histories setiap buka
   if (pageId && pageId.startsWith('kpi-')) {
-    try {
-      if (typeof kpiRenderHistories === 'function') kpiRenderHistories(pageId.replace('kpi-',''));
-    } catch(e) { console.warn('KPI render error:', e); }
+    const kpiType = pageId.replace('kpi-','');
     setTimeout(() => {
+      try { if (typeof renderKpiPage === 'function') renderKpiPage(kpiType); } catch(e) {}
       const pg2 = document.getElementById('page-' + pageId);
       if (pg2) pg2.scrollTop = 0;
     }, 50);
-    // Auto-expand KPI group di sidebar
-    const kpiHdr = document.getElementById('sbar-kpi-hdr');
-    const kpiSub = document.getElementById('sbar-kpi-sub');
-    if (kpiHdr) kpiHdr.classList.add('open');
-    if (kpiSub) kpiSub.classList.add('open');
   }
 
   // Update breadcrumb (sidebar navigation = not from dashboard)
@@ -7018,50 +7132,432 @@ function calcCV(){
   if(mv)pts.push(`<span>Mix: <b style="color:${mv>0?'#ef4444':'#10b981'}">${mv>0?'+':''}${_kpiRp(mv)}</b></span>`);
   bd.innerHTML=pts.join('');
 }
-function kpiSave(key) {
-  const now=new Date().toLocaleDateString('id-ID');
-  const g=id=>+document.getElementById(id)?.value||0, s=id=>document.getElementById(id)?.value||now;
-  if(key==='dmcr'){const bb=g('kpi-dmcr-bb'),rev=g('kpi-dmcr-rev');if(!bb||!rev){toast('Isi Bahan Baku dan Revenue','warn');return;}const r=(bb/rev*100).toFixed(2);kpiData.dmcr.unshift({period:s('kpi-dmcr-period'),bb,rev,ratio:r,status:r<=40?'Efisien':r<=60?'Perhatian':'Tinggi'});if(kpiData.dmcr.length>12)kpiData.dmcr.pop();}
-  else if(key==='iwr'){const wo=g('kpi-iwr-writeoff'),avg=g('kpi-iwr-avginv');if(!wo||!avg){toast('Isi Write-Off dan Avg Inventory','warn');return;}const r=(wo/avg*100).toFixed(2);kpiData.iwr.unshift({period:s('kpi-iwr-period'),wo,avg,ratio:r,ket:document.getElementById('kpi-iwr-ket')?.value||'',status:r<=1?'Baik':r<=3?'Perhatian':'Tinggi'});if(kpiData.iwr.length>12)kpiData.iwr.pop();}
-  else if(key==='pr'){const act=g('kpi-pr-actual'),lst=g('kpi-pr-list');if(!act||!lst){toast('Isi Actual Price dan List Price','warn');return;}const r=(act/lst*100).toFixed(2);kpiData.pr.unshift({period:s('kpi-pr-period'),actual:act,list:lst,ratio:r,status:r>=95?'Optimal':r>=85?'Perhatian':'Rendah'});if(kpiData.pr.length>12)kpiData.pr.pop();}
-  else if(key==='cv'){const ca=g('kpi-cv-actual'),cs=g('kpi-cv-standard');if(!ca||!cs){toast('Isi Actual dan Standard COGS','warn');return;}const r=((ca-cs)/cs*100).toFixed(2);kpiData.cv.unshift({period:s('kpi-cv-period'),actual:ca,std:cs,variance:r,price:g('kpi-cv-price'),usage:g('kpi-cv-usage'),mix:g('kpi-cv-mix'),status:r<=0?'Favorable':r<=5?'Perhatian':'Unfavorable'});if(kpiData.cv.length>12)kpiData.cv.pop();}
-  _kpiSave();
-  kpiRenderHistories(key);
-  toast('KPI disimpan','success');
-}
-function kpiClear(key) {
-  const ids={dmcr:['kpi-dmcr-bb','kpi-dmcr-rev','kpi-dmcr-period'],iwr:['kpi-iwr-writeoff','kpi-iwr-avginv','kpi-iwr-period','kpi-iwr-ket'],pr:['kpi-pr-actual','kpi-pr-list','kpi-pr-period'],cv:['kpi-cv-actual','kpi-cv-standard','kpi-cv-period','kpi-cv-price','kpi-cv-usage','kpi-cv-mix']};
-  (ids[key]||[]).forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  const valEl=document.getElementById('kpi-'+key+'-val');if(valEl){valEl.textContent='—';valEl.style.color='var(--text2)';}
-  const bg=document.getElementById('kpi-'+key+'-badge');if(bg)bg.textContent='';
-  if(key==='cv'){const bd=document.getElementById('kpi-cv-breakdown');if(bd)bd.innerHTML='';}
-}
-function kpiSaveAll(){
-  ['dmcr','iwr','pr','cv'].forEach(k=>kpiSave(k));
-}
-function kpiClearAll(){
-  ['dmcr','iwr','pr','cv'].forEach(k=>kpiClear(k));
+const KPI_CFG = {
+  dm: {
+    label:   'Direct Material Cost Ratio',
+    color:   '#0891b2',
+    grad:    'linear-gradient(135deg,#0891b2,#0e7490)',
+    icon:    'ti-package',
+    unit:    '%',
+    formula: (d) => d.val2 > 0 ? +(d.val1 / d.val2 * 100).toFixed(2) : null,
+    col1: 'Bahan Baku (Rp)', col2: 'Revenue (Rp)', colRatio: 'DM Cost Ratio (%)',
+  },
+  iw: {
+    label:   'Inventory Write-Off Ratio',
+    color:   '#dc2626',
+    grad:    'linear-gradient(135deg,#dc2626,#b91c1c)',
+    icon:    'ti-trash-off',
+    unit:    '%',
+    formula: (d) => d.val2 > 0 ? +(d.val1 / d.val2 * 100).toFixed(2) : null,
+    col1: 'Nilai Write-off (Rp)', col2: 'Avg Inventory (Rp)', colRatio: 'Write-Off Ratio (%)',
+  },
+  pr: {
+    label:   'Pricing Realization',
+    color:   '#16a34a',
+    grad:    'linear-gradient(135deg,#16a34a,#15803d)',
+    icon:    'ti-tag',
+    unit:    '%',
+    formula: (d) => d.val2 > 0 ? +(d.val1 / d.val2 * 100).toFixed(2) : null,
+    col1: 'Avg Selling Price Actual (Rp)', col2: 'List Price (Rp)', colRatio: 'Pricing Realization (%)',
+  },
+  cv: {
+    label:   'COGS Variance vs Standard',
+    color:   '#7c3aed',
+    grad:    'linear-gradient(135deg,#7c3aed,#6d28d9)',
+    icon:    'ti-calculator',
+    unit:    '%',
+    formula: (d) => d.val2 !== 0 ? +((d.val1 - d.val2) / d.val2 * 100).toFixed(2) : null,
+    col1: 'Actual COGS (Rp)', col2: 'Standard COGS (Rp)', colRatio: 'Variance (%)',
+  },
+};
+
+
+function toggleKPIGroup() {
+  const hdr = document.getElementById('sbar-kpi-hdr');
+  const sub = document.getElementById('sbar-kpi-sub');
+  hdr.classList.toggle('open');
+  sub.classList.toggle('open');
 }
 
-function kpiClearAll(){
-  ['kpi-dmcr-bb','kpi-dmcr-rev','kpi-dmcr-period','kpi-iwr-writeoff','kpi-iwr-avginv','kpi-iwr-period','kpi-iwr-ket','kpi-pr-actual','kpi-pr-list','kpi-pr-period','kpi-cv-actual','kpi-cv-standard','kpi-cv-period','kpi-cv-price','kpi-cv-usage','kpi-cv-mix']
-    .forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['kpi-dmcr-val','kpi-iwr-val','kpi-pr-val','kpi-cv-val'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent='—';el.style.color='var(--text2)';}});
-  ['kpi-dmcr-badge','kpi-iwr-badge','kpi-pr-badge','kpi-cv-badge'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='';});
-  const bd=document.getElementById('kpi-cv-breakdown');if(bd)bd.innerHTML='';
-}
-function kpiRenderHistories(key){
-  const fmt=n=>Number(n).toLocaleString('id-ID');
-  const sc=s=>({'Favorable':'#10b981','Optimal':'#10b981','Efisien':'#10b981','Baik':'#10b981','Perhatian':'#f59e0b'}[s]||'#ef4444');
-  const empty=n=>`<tr><td colspan="${n}" style="text-align:center;color:var(--text2)">Belum ada data</td></tr>`;
-  const tb=id=>document.getElementById(id);
-  if(tb('kpi-dmcr-history'))tb('kpi-dmcr-history').innerHTML=kpiData.dmcr.length?kpiData.dmcr.map(r=>`<tr><td>${r.period}</td><td>${fmt(r.bb)}</td><td>${fmt(r.rev)}</td><td><b>${r.ratio}%</b></td><td style="color:${sc(r.status)}">${r.status}</td></tr>`).join(''):empty(5);
-  if(tb('kpi-iwr-history'))tb('kpi-iwr-history').innerHTML=kpiData.iwr.length?kpiData.iwr.map(r=>`<tr><td>${r.period}</td><td>${fmt(r.wo)}</td><td>${fmt(r.avg)}</td><td><b>${r.ratio}%</b></td><td style="color:${sc(r.status)}">${r.status}</td></tr>`).join(''):empty(5);
-  if(tb('kpi-pr-history'))tb('kpi-pr-history').innerHTML=kpiData.pr.length?kpiData.pr.map(r=>`<tr><td>${r.period}</td><td>${fmt(r.actual)}</td><td>${fmt(r.list)}</td><td><b>${r.ratio}%</b></td><td style="color:${sc(r.status)}">${r.status}</td></tr>`).join(''):empty(5);
-  if(tb('kpi-cv-history'))tb('kpi-cv-history').innerHTML=kpiData.cv.length?kpiData.cv.map(r=>`<tr><td>${r.period}</td><td>${fmt(r.actual)}</td><td>${fmt(r.std)}</td><td><b style="color:${sc(r.status)}">${r.variance>=0?'+':''}${r.variance}%</b></td><td>${r.price?fmt(r.price):'—'}</td><td>${r.usage?fmt(r.usage):'—'}</td><td>${r.mix?fmt(r.mix):'—'}</td></tr>`).join(''):empty(7);
-}
-// kpiRenderHistories dipanggil langsung dari sidebarNav patch di bawah
+function openKpiModal(type, editIdx) {
+  const cfg = KPI_CFG[type];
+  if (!cfg) return;
+  kpiIsEdit = (editIdx !== undefined && editIdx !== null);
+  kpiDelType = null; kpiDelIdx = null;
 
+  // Style modal header
+  const head = document.getElementById('kpi-modal-head');
+  head.style.background = cfg.grad;
+  document.getElementById('kpi-modal-title').textContent = kpiIsEdit ? `Edit ${cfg.label}` : `Input ${cfg.label}`;
+  document.getElementById('kpi-submit-btn').style.background = cfg.grad;
+  document.getElementById('kpi-type').value = type;
+  document.getElementById('kpi-edit-idx').value = kpiIsEdit ? editIdx : '';
+
+  // Show only relevant fields
+  ['dm','iw','pr','cv'].forEach(t => {
+    document.getElementById('kpi-fields-' + t).style.display = t === type ? '' : 'none';
+  });
+
+  // Reset period to bulanan
+  selectKpiPeriod('bulanan');
+
+  // Default values
+  const now = new Date();
+  document.getElementById('kpi-bulan').value   = kpiIsEdit ? '' : (now.getMonth() + 1);
+  document.getElementById('kpi-quartal').value = '';
+  document.getElementById('kpi-tahun').value   = kpiIsEdit ? '' : now.getFullYear();
+  document.getElementById('kpi-area').value    = '';
+  document.getElementById('kpi-catatan').value = '';
+
+  // Reset specific inputs
+  if (type === 'dm') {
+    document.getElementById('kpi-dm-bahan').value   = '';
+    document.getElementById('kpi-dm-revenue').value = '';
+    document.getElementById('kpi-dm-result').textContent = '—';
+  } else if (type === 'iw') {
+    document.getElementById('kpi-iw-writeoff').value = '';
+    document.getElementById('kpi-iw-avginv').value   = '';
+    document.getElementById('kpi-iw-result').textContent = '—';
+  } else if (type === 'pr') {
+    document.getElementById('kpi-pr-actual').value = '';
+    document.getElementById('kpi-pr-list').value   = '';
+    document.getElementById('kpi-pr-result').textContent = '—';
+  } else if (type === 'cv') {
+    document.getElementById('kpi-cv-actual').value   = '';
+    document.getElementById('kpi-cv-standard').value = '';
+    document.getElementById('kpi-cv-result').textContent = '—';
+    const chk = document.getElementById('kpi-cv-pisah');
+    if (chk) { chk.checked = false; togglePisahVariance(); }
+    document.getElementById('kpi-cv-price-var').value = '';
+    document.getElementById('kpi-cv-usage-var').value = '';
+    document.getElementById('kpi-cv-mix-var').value   = '';
+  }
+
+  // If edit mode, restore saved data
+  if (kpiIsEdit) {
+    const row = kpiData[type][editIdx];
+    if (row) {
+      // Restore period type
+      const pType = row.periodType || 'bulanan';
+      selectKpiPeriod(pType);
+      if (pType === 'bulanan') {
+        document.getElementById('kpi-bulan').value = row.bulan || '';
+      } else {
+        document.getElementById('kpi-quartal').value = row.quartal || '';
+      }
+      document.getElementById('kpi-tahun').value   = row.tahun || '';
+      document.getElementById('kpi-area').value    = row.area  || '';
+      document.getElementById('kpi-catatan').value = row.catatan || '';
+
+      if (type === 'dm') {
+        document.getElementById('kpi-dm-bahan').value   = row.val1;
+        document.getElementById('kpi-dm-revenue').value = row.val2;
+        kpiCalc('dm');
+      } else if (type === 'iw') {
+        document.getElementById('kpi-iw-writeoff').value = row.val1;
+        document.getElementById('kpi-iw-avginv').value   = row.val2;
+        kpiCalc('iw');
+      } else if (type === 'pr') {
+        document.getElementById('kpi-pr-actual').value = row.val1;
+        document.getElementById('kpi-pr-list').value   = row.val2;
+        kpiCalc('pr');
+      } else if (type === 'cv') {
+        document.getElementById('kpi-cv-actual').value   = row.val1;
+        document.getElementById('kpi-cv-standard').value = row.val2;
+        kpiCalc('cv');
+        if (row.pisah) {
+          const chk = document.getElementById('kpi-cv-pisah');
+          if (chk) { chk.checked = true; togglePisahVariance(); }
+          document.getElementById('kpi-cv-price-var').value = row.priceVar || '';
+          document.getElementById('kpi-cv-usage-var').value = row.usageVar || '';
+          document.getElementById('kpi-cv-mix-var').value   = row.mixVar   || '';
+        }
+      }
+    }
+  }
+
+  document.getElementById('modal-kpi').classList.add('open');
+}
+
+function closeKpiModal() {
+  document.getElementById('modal-kpi').classList.remove('open');
+}
+
+// --- Live Calculation ---
+function kpiCalc(type) {
+  let v1, v2, result, el;
+  if (type === 'dm') {
+    v1 = parseFloat(document.getElementById('kpi-dm-bahan').value)   || 0;
+    v2 = parseFloat(document.getElementById('kpi-dm-revenue').value)  || 0;
+    el = document.getElementById('kpi-dm-result');
+    result = v2 > 0 ? (v1 / v2 * 100).toFixed(2) : null;
+  } else if (type === 'iw') {
+    v1 = parseFloat(document.getElementById('kpi-iw-writeoff').value) || 0;
+    v2 = parseFloat(document.getElementById('kpi-iw-avginv').value)   || 0;
+    el = document.getElementById('kpi-iw-result');
+    result = v2 > 0 ? (v1 / v2 * 100).toFixed(2) : null;
+  } else if (type === 'pr') {
+    v1 = parseFloat(document.getElementById('kpi-pr-actual').value)   || 0;
+    v2 = parseFloat(document.getElementById('kpi-pr-list').value)     || 0;
+    el = document.getElementById('kpi-pr-result');
+    result = v2 > 0 ? (v1 / v2 * 100).toFixed(2) : null;
+  } else if (type === 'cv') {
+    v1 = parseFloat(document.getElementById('kpi-cv-actual').value)   || 0;
+    v2 = parseFloat(document.getElementById('kpi-cv-standard').value) || 0;
+    el = document.getElementById('kpi-cv-result');
+    result = v2 !== 0 ? ((v1 - v2) / v2 * 100).toFixed(2) : null;
+  }
+  if (!el) return;
+  if (result !== null) {
+    const num = parseFloat(result);
+    let color = KPI_CFG[type].color;
+    // CV: positive variance = bad (merah), negative = good (hijau)
+    if (type === 'cv') color = num > 0 ? '#dc2626' : num < 0 ? '#16a34a' : '#64748b';
+    el.textContent  = result + ' %';
+    el.style.color  = color;
+  } else {
+    el.textContent = '—';
+    el.style.color = '#64748b';
+  }
+}
+
+// --- Toggle Pisah Variance UI ---
+function togglePisahVariance() {
+  const chk   = document.getElementById('kpi-cv-pisah');
+  const track = document.getElementById('kpi-cv-pisah-track');
+  const thumb = document.getElementById('kpi-cv-pisah-thumb');
+  const fields = document.getElementById('kpi-cv-pisah-fields');
+  const on = chk && chk.checked;
+  if (track) { track.style.background = on ? '#7c3aed' : '#e2e8f0'; }
+  if (thumb) { thumb.style.left = on ? '21px' : '3px'; }
+  if (fields) { fields.style.display = on ? '' : 'none'; }
+}
+
+// --- Submit KPI ---
+function submitKpi() {
+  const type       = document.getElementById('kpi-type').value;
+  const periodType = document.getElementById('kpi-period-type').value || 'bulanan';
+  const tahun      = parseInt(document.getElementById('kpi-tahun').value) || 0;
+  const area       = document.getElementById('kpi-area').value;
+  const catatan    = document.getElementById('kpi-catatan').value.trim();
+
+  // Period validation
+  let bulan = 0, quartal = '';
+  if (periodType === 'bulanan') {
+    bulan = parseInt(document.getElementById('kpi-bulan').value) || 0;
+    if (!bulan) { toast('Bulan wajib dipilih', 'error'); return; }
+  } else {
+    quartal = document.getElementById('kpi-quartal').value;
+    if (!quartal) { toast('Quartal wajib dipilih', 'error'); return; }
+  }
+  if (!tahun) { toast('Tahun wajib dipilih', 'error'); return; }
+  if (!area)  { toast('Area wajib dipilih', 'error'); return; }
+
+  let val1, val2, extra = {};
+
+  if (type === 'dm') {
+    val1 = parseFloat(document.getElementById('kpi-dm-bahan').value);
+    val2 = parseFloat(document.getElementById('kpi-dm-revenue').value);
+    if (isNaN(val1) || isNaN(val2)) { toast('Nilai Bahan Baku dan Revenue wajib diisi', 'error'); return; }
+    if (val2 <= 0) { toast('Revenue harus lebih dari 0', 'error'); return; }
+  } else if (type === 'iw') {
+    val1 = parseFloat(document.getElementById('kpi-iw-writeoff').value);
+    val2 = parseFloat(document.getElementById('kpi-iw-avginv').value);
+    if (isNaN(val1) || isNaN(val2)) { toast('Nilai Write-off dan Avg Inventory wajib diisi', 'error'); return; }
+    if (val2 <= 0) { toast('Avg Inventory harus lebih dari 0', 'error'); return; }
+  } else if (type === 'pr') {
+    val1 = parseFloat(document.getElementById('kpi-pr-actual').value);
+    val2 = parseFloat(document.getElementById('kpi-pr-list').value);
+    if (isNaN(val1) || isNaN(val2)) { toast('Avg Selling Price dan List Price wajib diisi', 'error'); return; }
+    if (val2 <= 0) { toast('List Price harus lebih dari 0', 'error'); return; }
+  } else if (type === 'cv') {
+    val1 = parseFloat(document.getElementById('kpi-cv-actual').value);
+    val2 = parseFloat(document.getElementById('kpi-cv-standard').value);
+    if (isNaN(val1) || isNaN(val2)) { toast('Actual COGS dan Standard COGS wajib diisi', 'error'); return; }
+    if (val2 === 0) { toast('Standard COGS tidak boleh 0', 'error'); return; }
+    const pisah = document.getElementById('kpi-cv-pisah')?.checked || false;
+    extra = {
+      pisah,
+      priceVar: pisah ? (parseFloat(document.getElementById('kpi-cv-price-var').value) || null) : null,
+      usageVar: pisah ? (parseFloat(document.getElementById('kpi-cv-usage-var').value) || null) : null,
+      mixVar:   pisah ? (parseFloat(document.getElementById('kpi-cv-mix-var').value)   || null) : null,
+    };
+  } else {
+    toast('Tipe KPI tidak dikenal', 'error'); return;
+  }
+
+  const cfg     = KPI_CFG[type];
+  const ratio   = cfg.formula({ val1, val2 });
+  const editIdx = document.getElementById('kpi-edit-idx').value;
+  const now     = new Date();
+  const tglInput = `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
+
+  const row = { periodType, bulan: periodType === 'bulanan' ? bulan : null, quartal: periodType === 'quartal' ? quartal : null, tahun, area, val1, val2, ratio, catatan, tglInput, ...extra };
+
+  if (kpiIsEdit && editIdx !== '') {
+    kpiData[type][parseInt(editIdx)] = row;
+    toast(`Data ${cfg.label} berhasil diperbarui`, 'success');
+  } else {
+    kpiData[type].push(row);
+    toast(`Data ${cfg.label} berhasil disimpan`, 'success');
+  }
+
+  closeKpiModal();
+  renderKpiPage(type);
+}
+
+// --- Render KPI Table & Stats ---
+function renderKpiPage(type) {
+  const cfg  = KPI_CFG[type];
+  const data = kpiData[type];
+  const tbody = document.getElementById('kpi-' + type + '-tbody');
+  const cntEl = document.getElementById('kpi-' + type + '-tbl-count');
+  const latEl = document.getElementById('kpi-' + type + '-latest');
+  const avgEl = document.getElementById('kpi-' + type + '-avg');
+  const cEl   = document.getElementById('kpi-' + type + '-count');
+
+  if (!tbody) return;
+
+  // Stats
+  const ratios = data.map(r => r.ratio).filter(v => v !== null && v !== undefined);
+  const latest = data.length > 0 ? data[data.length - 1].ratio : null;
+  const avg    = ratios.length > 0 ? (ratios.reduce((s,v) => s + v, 0) / ratios.length).toFixed(2) : null;
+
+  if (latEl) latEl.textContent = latest !== null ? latest + '%' : '—';
+  if (avgEl) avgEl.textContent = avg    !== null ? avg    + '%' : '—';
+  if (cEl)   cEl.textContent   = data.length;
+  if (cntEl) cntEl.textContent = data.length;
+
+  // Update table headers dynamically for CV vs other
+  const theadRow = tbody.closest('table')?.querySelector('thead tr');
+  if (theadRow) {
+    if (type === 'cv') {
+      theadRow.innerHTML = `<th>No.</th><th>Periode</th><th>Tahun</th><th>Area</th>
+        <th>Actual COGS (Rp)</th><th>Standard COGS (Rp)</th>
+        <th>Variance (%)</th><th>Pisah Variance</th>
+        <th>Price Var (%)</th><th>Usage Var (%)</th><th>Mix Var (%)</th>
+        <th>Catatan</th><th>Tgl Input</th><th>Aksi</th>`;
+    } else {
+      const cfg2 = KPI_CFG[type];
+      theadRow.innerHTML = `<th>No.</th><th>Periode</th><th>Tahun</th><th>Area</th>
+        <th>${cfg2.col1}</th><th>${cfg2.col2}</th>
+        <th>${cfg2.colRatio}</th><th>Catatan</th><th>Tgl Input</th><th>Aksi</th>`;
+    }
+  }
+
+  // Table rows
+  if (!data.length) {
+    const cols = type === 'cv' ? 14 : 10;
+    tbody.innerHTML = `<tr><td colspan="${cols}" style="text-align:center;padding:32px;color:var(--text2);font-size:13px;">
+      <i class="ti ti-database-off" style="font-size:28px;display:block;margin-bottom:8px;opacity:.4"></i>
+      Belum ada data. Klik <strong>Input Data</strong> untuk menambahkan.
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = data.map((row, idx) => {
+    const ratioDisp = row.ratio !== null && row.ratio !== undefined ? row.ratio + '%' : '—';
+    let ratioColor  = cfg.color;
+    if (type === 'cv' && row.ratio !== null) {
+      ratioColor = row.ratio > 0 ? '#dc2626' : row.ratio < 0 ? '#16a34a' : '#64748b';
+    }
+
+    const fmtRp = v => v !== undefined && v !== null
+      ? 'Rp ' + Number(v).toLocaleString('id-ID')
+      : '—';
+
+    // Periode cell
+    let periodeDisp;
+    if (row.periodType === 'quartal') {
+      const qColors = { Q1:'#2563eb', Q2:'#0d9488', Q3:'#d97706', Q4:'#7c3aed' };
+      const qc = qColors[row.quartal] || '#64748b';
+      periodeDisp = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;background:${qc}18;color:${qc};">
+        <i class="ti ti-calendar-stats" style="font-size:11px"></i>${row.quartal||'—'}
+      </span>`;
+    } else {
+      periodeDisp = `<span style="font-weight:600;color:var(--navy);">${MONTHS_ID[(row.bulan||1)-1]||'—'}</span>`;
+    }
+
+    // Area badge
+    const areaColor  = row.area === 'DKE' ? 'var(--blue)' : '#0d9488';
+    const areaBg     = row.area === 'DKE' ? '#eff6ff' : '#f0fdfa';
+    const areaDisp   = row.area
+      ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;background:${areaBg};color:${areaColor};">
+           <i class="ti ti-${row.area==='DKE'?'building':'cpu'}" style="font-size:11px"></i>${row.area}
+         </span>`
+      : '<span style="color:var(--text2);font-size:12px;">—</span>';
+
+    let extraCols = '';
+    if (type === 'cv') {
+      const pisahLabel = row.pisah
+        ? `<span style="font-size:10px;background:#f5f3ff;color:#7c3aed;border-radius:4px;padding:2px 6px;font-weight:600;">Ya</span>`
+        : `<span style="font-size:10px;color:var(--text2);">Tidak</span>`;
+      const pv = row.priceVar !== null && row.priceVar !== undefined ? row.priceVar + '%' : '—';
+      const uv = row.usageVar !== null && row.usageVar !== undefined ? row.usageVar + '%' : '—';
+      const mv = row.mixVar   !== null && row.mixVar   !== undefined ? row.mixVar   + '%' : '—';
+      extraCols = `<td style="text-align:center;">${pisahLabel}</td>
+        <td style="text-align:center;font-family:'DM Mono',monospace;font-size:12px;">${pv}</td>
+        <td style="text-align:center;font-family:'DM Mono',monospace;font-size:12px;">${uv}</td>
+        <td style="text-align:center;font-family:'DM Mono',monospace;font-size:12px;">${mv}</td>`;
+    }
+
+    return `<tr>
+      <td style="color:var(--text2);font-size:12px;text-align:center;">${idx + 1}</td>
+      <td>${periodeDisp}</td>
+      <td style="font-family:'DM Mono',monospace;font-weight:600;color:var(--navy);">${row.tahun||'—'}</td>
+      <td>${areaDisp}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;">${fmtRp(row.val1)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;">${fmtRp(row.val2)}</td>
+      <td style="text-align:center;">
+        <span style="font-family:'DM Mono',monospace;font-weight:700;font-size:13px;color:${ratioColor};">${ratioDisp}</span>
+      </td>
+      ${extraCols}
+      <td class="desc-cell"><span class="desc-text">${esc(row.catatan||'')}</span></td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap;">${row.tglInput||'—'}</td>
+      <td style="white-space:nowrap;">
+        <button class="action-btn edit" onclick="openKpiModal('${type}',${idx})">
+          <i class="ti ti-edit" style="font-size:13px"></i> Edit
+        </button>
+        <button class="action-btn del" onclick="openKpiDelModal('${type}',${idx})" style="margin-left:4px">
+          <i class="ti ti-trash" style="font-size:13px"></i>
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// --- Delete ---
+function openKpiDelModal(type, idx) {
+  kpiDelType = type;
+  kpiDelIdx  = idx;
+  const row  = kpiData[type][idx];
+  let periodeLabel = '—';
+  if (row) {
+    if (row.periodType === 'quartal') {
+      periodeLabel = `${row.quartal} ${row.tahun}`;
+    } else {
+      periodeLabel = `${MONTHS_ID[(row.bulan||1)-1]} ${row.tahun}`;
+    }
+  }
+  const label = row ? `${KPI_CFG[type].label} — ${periodeLabel} · ${row.area||''}` : '—';
+  document.getElementById('kpi-del-label').textContent = label;
+  document.getElementById('modal-kpi-del').classList.add('open');
+}
+function closeKpiDelModal() {
+  document.getElementById('modal-kpi-del').classList.remove('open');
+}
+function confirmKpiDelete() {
+  if (kpiDelType === null || kpiDelIdx === null) return;
+  kpiData[kpiDelType].splice(kpiDelIdx, 1);
+  toast('Data KPI berhasil dihapus', 'success');
+  closeKpiDelModal();
+  renderKpiPage(kpiDelType);
+  kpiDelType = null; kpiDelIdx = null;
+}
+
+</script>
+</body>
+</html
 // ── Auto-restore session dari Supabase Auth ─────────────────
 window.addEventListener('load', async () => {
   try {
@@ -7083,5 +7579,231 @@ window.addEventListener('load', async () => {
   document.getElementById('splash')?.classList.add('hidden');
 });
 </script>
+
+
+
+<div class="modal-overlay" id="modal-kpi" onclick="closeModalOutside(event)">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-head" id="kpi-modal-head" style="background:linear-gradient(135deg,#0891b2,#0e7490);">
+      <h3><i class="ti ti-chart-line"></i> <span id="kpi-modal-title">Input Data KPI</span></h3>
+      <button onclick="closeKpiModal()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1;">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="kpi-type">
+      <input type="hidden" id="kpi-edit-idx">
+
+      <!-- ====== TOGGLE PERIODE ====== -->
+      <div class="form-grp" style="margin-bottom:14px;">
+        <label style="margin-bottom:6px;display:block;">Tipe Periode <span class="req">*</span></label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <label id="kpi-period-bulanan-label" onclick="selectKpiPeriod('bulanan')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border:2px solid var(--blue);background:var(--blue-lt);border-radius:9px;cursor:pointer;transition:all .15s;">
+            <span id="kpi-period-bulanan-radio" style="width:16px;height:16px;border-radius:50%;border:2px solid var(--blue);flex-shrink:0;background:var(--blue);display:flex;align-items:center;justify-content:center;">
+              <i class="ti ti-check" style="font-size:9px;color:white;"></i>
+            </span>
+            <span style="font-size:13px;font-weight:600;color:var(--blue);display:flex;align-items:center;gap:6px;">
+              <i class="ti ti-calendar-month" style="font-size:14px"></i> Bulanan
+            </span>
+          </label>
+          <label id="kpi-period-quartal-label" onclick="selectKpiPeriod('quartal')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border:2px solid var(--border);background:white;border-radius:9px;cursor:pointer;transition:all .15s;">
+            <span id="kpi-period-quartal-radio" style="width:16px;height:16px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;"></span>
+            <span style="font-size:13px;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:6px;">
+              <i class="ti ti-calendar-stats" style="font-size:14px"></i> Quartal
+            </span>
+          </label>
+        </div>
+        <input type="hidden" id="kpi-period-type" value="bulanan">
+      </div>
+
+      <!-- Periode + Tahun + Area -->
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr;">
+
+        <!-- Bulanan selector -->
+        <div class="form-grp" id="kpi-bulan-grp">
+          <label>Bulan <span class="req">*</span></label>
+          <select class="form-ctrl" id="kpi-bulan">
+            <option value="">-- Pilih Bulan --</option>
+            <option value="1">Januari</option><option value="2">Februari</option>
+            <option value="3">Maret</option><option value="4">April</option>
+            <option value="5">Mei</option><option value="6">Juni</option>
+            <option value="7">Juli</option><option value="8">Agustus</option>
+            <option value="9">September</option><option value="10">Oktober</option>
+            <option value="11">November</option><option value="12">Desember</option>
+          </select>
+        </div>
+
+        <!-- Quartal selector -->
+        <div class="form-grp" id="kpi-quartal-grp" style="display:none;">
+          <label>Quartal <span class="req">*</span></label>
+          <select class="form-ctrl" id="kpi-quartal">
+            <option value="">-- Pilih Quartal --</option>
+            <option value="Q1">Q1 — Jan · Feb · Mar</option>
+            <option value="Q2">Q2 — Apr · Mei · Jun</option>
+            <option value="Q3">Q3 — Jul · Ags · Sep</option>
+            <option value="Q4">Q4 — Okt · Nov · Des</option>
+          </select>
+        </div>
+
+        <!-- Tahun dropdown -->
+        <div class="form-grp">
+          <label>Tahun <span class="req">*</span></label>
+          <select class="form-ctrl" id="kpi-tahun">
+            <option value="">-- Pilih Tahun --</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+            <option value="2028">2028</option>
+            <option value="2029">2029</option>
+            <option value="2030">2030</option>
+            <option value="2031">2031</option>
+            <option value="2032">2032</option>
+            <option value="2033">2033</option>
+            <option value="2034">2034</option>
+            <option value="2035">2035</option>
+          </select>
+        </div>
+
+        <!-- Area -->
+        <div class="form-grp">
+          <label>Area <span class="req">*</span></label>
+          <select class="form-ctrl" id="kpi-area">
+            <option value="">-- Pilih Area --</option>
+            <option value="DKE">DKE</option>
+            <option value="Tecno">Tecno</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- ====== DM Fields ====== -->
+      <div id="kpi-fields-dm">
+        <div class="form-row">
+          <div class="form-grp">
+            <label>Bahan Baku (At Standard Cost) <span class="req">*</span></label>
+            <input type="number" class="form-ctrl" id="kpi-dm-bahan" placeholder="0" min="0" step="any" oninput="kpiCalc('dm')">
+          </div>
+          <div class="form-grp">
+            <label>Revenue <span class="req">*</span></label>
+            <input type="number" class="form-ctrl" id="kpi-dm-revenue" placeholder="0" min="0" step="any" oninput="kpiCalc('dm')">
+          </div>
+        </div>
+        <div class="form-grp">
+          <label>Hasil Rasio (%)</label>
+          <div class="case-preview" id="kpi-dm-result" style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:#0891b2;">—</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px;">Bahan Baku / Revenue × 100%</div>
+        </div>
+      </div>
+
+      <!-- ====== IW Fields ====== -->
+      <div id="kpi-fields-iw" style="display:none;">
+        <div class="form-row">
+          <div class="form-grp">
+            <label>Nilai Write-off (Slow-Moving/Expired) <span class="req">*</span></label>
+            <input type="number" class="form-ctrl" id="kpi-iw-writeoff" placeholder="0" min="0" step="any" oninput="kpiCalc('iw')">
+          </div>
+          <div class="form-grp">
+            <label>Average Inventory <span class="req">*</span></label>
+            <input type="number" class="form-ctrl" id="kpi-iw-avginv" placeholder="0" min="0" step="any" oninput="kpiCalc('iw')">
+          </div>
+        </div>
+        <div class="form-grp">
+          <label>Hasil Rasio (%)</label>
+          <div class="case-preview" id="kpi-iw-result" style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:#dc2626;">—</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px;">Nilai Write-off / Avg Inventory × 100%</div>
+        </div>
+      </div>
+
+      <!-- ====== PR Fields ====== -->
+      <div id="kpi-fields-pr" style="display:none;">
+        <div class="form-row">
+          <div class="form-grp">
+            <label>Avg Selling Price Actual <span class="req">*</span></label>
+            <input type="number" class="form-ctrl" id="kpi-pr-actual" placeholder="0" min="0" step="any" oninput="kpiCalc('pr')">
+          </div>
+          <div class="form-grp">
+            <label>List Price <span class="req">*</span></label>
+            <input type="number" class="form-ctrl" id="kpi-pr-list" placeholder="0" min="0" step="any" oninput="kpiCalc('pr')">
+          </div>
+        </div>
+        <div class="form-grp">
+          <label>Hasil Rasio (%)</label>
+          <div class="case-preview" id="kpi-pr-result" style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:#16a34a;">—</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px;">Avg Selling Price Actual / List Price × 100%</div>
+        </div>
+      </div>
+
+      <!-- ====== CV Fields ====== -->
+      <div id="kpi-fields-cv" style="display:none;">
+        <div class="form-row">
+          <div class="form-grp">
+            <label>Actual COGS <span class="req">*</span></label>
+            <input type="number" class="form-ctrl" id="kpi-cv-actual" placeholder="0" step="any" oninput="kpiCalc('cv')">
+          </div>
+          <div class="form-grp">
+            <label>Standard COGS <span class="req">*</span></label>
+            <input type="number" class="form-ctrl" id="kpi-cv-standard" placeholder="0" step="any" oninput="kpiCalc('cv')">
+          </div>
+        </div>
+        <div class="form-grp">
+          <label>Hasil Variance (%)</label>
+          <div class="case-preview" id="kpi-cv-result" style="font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:#7c3aed;">—</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px;">(Actual COGS − Standard COGS) / Standard COGS × 100%</div>
+        </div>
+
+        <!-- Toggle Pisah Variance -->
+        <div class="form-grp">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;">
+            <span style="position:relative;display:inline-block;width:40px;height:22px;">
+              <input type="checkbox" id="kpi-cv-pisah" onchange="togglePisahVariance()" style="opacity:0;width:0;height:0;position:absolute;">
+              <span id="kpi-cv-pisah-track" style="position:absolute;inset:0;background:#e2e8f0;border-radius:11px;transition:.2s;"></span>
+              <span id="kpi-cv-pisah-thumb" style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:white;border-radius:50%;transition:.2s;box-shadow:0 1px 4px rgba(0,0,0,.2);"></span>
+            </span>
+            <span style="font-size:13px;font-weight:600;color:var(--text);">Pisah Price / Usage / Mix Variance</span>
+          </label>
+        </div>
+
+        <!-- Pisah Variance Fields (hidden by default) -->
+        <div id="kpi-cv-pisah-fields" style="display:none;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:14px;margin-top:4px;">
+          <div style="font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+            <i class="ti ti-chart-bar" style="font-size:14px"></i> Detail Variance
+          </div>
+          <div class="form-row">
+            <div class="form-grp" style="margin-bottom:10px;">
+              <label>Price Variance (%)</label>
+              <input type="number" class="form-ctrl" id="kpi-cv-price-var" placeholder="0.00" step="any">
+            </div>
+            <div class="form-grp" style="margin-bottom:10px;">
+              <label>Usage Variance (%)</label>
+              <input type="number" class="form-ctrl" id="kpi-cv-usage-var" placeholder="0.00" step="any">
+            </div>
+          </div>
+          <div class="form-grp" style="margin-bottom:0;">
+            <label>Mix Variance (%)</label>
+            <input type="number" class="form-ctrl" id="kpi-cv-mix-var" placeholder="0.00" step="any">
+          </div>
+          <div style="font-size:11px;color:#7c3aed;margin-top:8px;"><i class="ti ti-info-circle" style="font-size:12px"></i> Isi nilai masing-masing komponen variance secara manual</div>
+        </div>
+      </div>
+
+      <!-- Catatan (semua tipe) -->
+      <div class="form-grp" style="margin-top:14px;margin-bottom:0;">
+        <label>Catatan</label>
+        <textarea class="form-ctrl" id="kpi-catatan" rows="2" placeholder="Keterangan tambahan (opsional)..."></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeKpiModal()">Batal</button>
+      <button class="btn-submit" id="kpi-submit-btn" onclick="submitKpi()" style="background:linear-gradient(135deg,#0891b2,#0e7490);" id="kpi-modal-submit">
+        <i class="ti ti-device-floppy"></i> <span id="kpi-submit-text">Simpan Data</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- KPI DELETE CONFIRM -->
+<div class="modal-overlay" id="modal-kpi-del" onclick="closeModalOutside(event)">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-head" style="background:var(--red)">
+      <h3><i class="ti ti-trash"></i> Hapus Data KPI</h3>
+      <button onclick="closeKpiDelModal()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;">×</button>
+    </div>
 </body>
 </html>
